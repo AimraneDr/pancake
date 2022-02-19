@@ -1,9 +1,8 @@
 #include "pancake_memory.h"
 #include "core/logger.h"
+#include "core/pancake_string.h"
 #include "platform/platform.h"
 #include <stdio.h>
-//TODO: Custem string lib
-#include <string.h>
 
 
 struct memory_stats{
@@ -78,7 +77,7 @@ char* get_memory_usage_str(){
     const u64 Kb = 1024;
 
     char buffer[8000] = "system memor usage (tagged) :\n";
-    u64 offset = strlen(buffer);
+    u64 offset = string_length(buffer);
     for(i32 i=0; i < MEMORY_TAG_MAX_TAGS; ++i){
         char unit[3] = "Xb";
         float amount = 1.0f;
@@ -101,6 +100,6 @@ char* get_memory_usage_str(){
         offset += snprintf(buffer + offset, 8000, "  %s : %.2f %s\n", memory_tags_string[i], amount, unit);
     }
 
-    char* out_string = _strdup(buffer);
+    char* out_string = string_duplicate(buffer);
     return out_string;
 }
