@@ -26,13 +26,13 @@ static input_state state = {};
 
 //inplementations
 
-void inputs_initialize(){
+void initialize_inputs(){
     //actully we don't have zero out memory for state because it is a static var and it is zeroed by default
     pancake_zero_memory(&state,sizeof(input_state));
     initialized = TRUE;
     PANCAKE_INFO("Inputs system had been intialized .");
 }
-void inputs_shatdown(){
+void shutdown_inputs(){
     //TODO: shutdown routines when needed
     initialized = FALSE;
 }

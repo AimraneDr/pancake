@@ -14,7 +14,7 @@ b8 platform_startup(
     i32 height
 );
 
-void platform_shutdown(platform_state* plat_state);
+void shutdown_platform(platform_state* plat_state);
 
 b8 platform_pump_messages(platform_state* state);
 

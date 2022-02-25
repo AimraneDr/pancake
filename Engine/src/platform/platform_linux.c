@@ -6,6 +6,7 @@
 #include "core/logger.h"
 #include "core/event.h"
 #include "core/inputs.h"
+#include "containers/list.h"
 
 #include <xcb/xcb.h>
 #include <X11/keysym.h>
@@ -164,7 +165,7 @@ b8 platform_startup(
     return TRUE;
 }
 
-void platform_shutdown(platform_state* plat_state) {
+void shutdown_platform(platform_state* plat_state) {
     // Simply cold-cast to the known type.
     internal_state* state = (internal_state*)plat_state->internal_state;
 
@@ -305,6 +306,10 @@ void platform_sleep(u64 ms) {
     }
     usleep((ms % 1000) * 1000);
 #endif
+}
+
+void platform_get_required_extensions(const char ***names_list){
+    list_push(*names_list, &"VK_KHR_xcb_surface");
 }
 
 // Key translation

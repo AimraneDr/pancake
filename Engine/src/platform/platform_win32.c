@@ -6,6 +6,8 @@
 
 #include "core/logger.h"
 #include "core/inputs.h"
+#include "containers/list.h"
+
 #include <Windows.h>
 #include <windowsx.h> // parameters input extraction
 #include <stdlib.h>
@@ -105,7 +107,7 @@ b8 platform_startup(platform_state *plat_state, char* application_name, i32 x, i
     return TRUE;
 }
 
-void platform_shutdown(platform_state *plat_state){
+void shutdown_platform(platform_state *plat_state){
     internal_state *state = (internal_state *)plat_state->internal_state;
 
     if(state->hwnd){
@@ -176,6 +178,10 @@ f64 platform_get_absolute_time(){
 
 void platform_sleep(u64 ms){
     Sleep(ms);
+}
+
+void platform_get_required_extensions(const char ***names_list){
+    list_push(*names_list, &"VK_KHR_win32_surface");
 }
 
 LRESULT CALLBACK win32_process_message(HWND hwnd,u32 msg,WPARAM w_param,LPARAM l_param){

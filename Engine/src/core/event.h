@@ -24,8 +24,8 @@ typedef struct event_context{
 //should return true if handled
 typedef b8 (*on_event_fnp)(u16 code, void* sender, void* lestener_inst, event_context data);
 
-b8 event_initialize();
-void event_shutdown();
+b8 initialize_evnets();
+void shutdown_event();
 
 /*
     Register to listen for when events are sent with the provided code.

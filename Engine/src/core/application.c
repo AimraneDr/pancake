@@ -5,6 +5,8 @@
 #include "core/pancake_memory.h"
 #include "core/event.h"
 #include "core/inputs.h"
+#include "core/clock.h"
+#include "renderer/renderer_frontend.h"
 
 typedef struct application_state{
     game* game_inst;
@@ -13,6 +15,7 @@ typedef struct application_state{
     platform_state platform;
     i16 width;
     i16 height;
+    Clock clock;
     f64 last_time;
 }application_state;
 
@@ -34,20 +37,12 @@ b8 application_create(game* game_inst){
 
     //initialize subsystems
     initialize_logging();
-    inputs_initialize();
-
-    //TODO: REMOVE THESE
-    PANCAKE_FATAL("A test message: %f", 3.14f);
-    PANCAKE_ERROR("A test message: %f", 3.14f);
-    PANCAKE_WARN("A test message: %f", 3.14f);
-    PANCAKE_INFO("A test message: %f", 3.14f);
-    PANCAKE_DEBUG("A test message: %f", 3.14f);
-    PANCAKE_TRACE("A test message: %f", 3.14f);
+    initialize_inputs();
 
     app_state.is_running = TRUE;
     app_state.is_suspended = FALSE;
     
-    if(!event_initialize()){
+    if(!initialize_evnets()){
         PANCAKE_FATAL("Events system failed initialization, cannot continue with the application !")
         return FALSE;
     }
@@ -67,6 +62,12 @@ b8 application_create(game* game_inst){
         return FALSE;
     }
     
+    //initialize the renderer
+    if(!initialize_renderer(game_inst->config.name, &app_state.platform)){
+        PANCAKE_FATAL("Failed to initialize the renderer, Aborting application...");
+        return FALSE;
+    }
+
     //Initialize the game
     if(!app_state.game_inst->Initialize(app_state.game_inst)){
         PANCAKE_FATAL("Could not Initialize the game !");
@@ -79,6 +80,15 @@ b8 application_create(game* game_inst){
     return TRUE;
 }
 b8 application_run(){
+    clock_start(&app_state.clock);
+    clock_update(&app_state.clock);
+    app_state.last_time = app_state.clock.elapsed;
+
+    f64 running_time = 0;
+    u8 frame_count = 0;
+    f64 target_frame_seconds = 1.0f / 60;
+
+
     PANCAKE_INFO(get_memory_usage_str());
     while(app_state.is_running){
         if(!platform_pump_messages(&app_state.platform)){
@@ -86,23 +96,54 @@ b8 application_run(){
         }
 
         if(!app_state.is_suspended){
-            if(!app_state.game_inst->Update(app_state.game_inst,(f32)0)){
+
+            //update clock,and get delta_time
+            clock_update(&app_state.clock);
+            f64 current_time =app_state.clock.elapsed;
+            f64 delta = (current_time - app_state.last_time);
+            f64 frame_start_time = platform_get_absolute_time();
+
+            if(!app_state.game_inst->Update(app_state.game_inst,(f32)delta)){
                 PANCAKE_FATAL("Game Update failed shutting down !");
                 app_state.is_running = FALSE;
                 break;
             }
 
-            if(!app_state.game_inst->Redner(app_state.game_inst,(f32)0)){
+            //call the game's render routine
+            if(!app_state.game_inst->Redner(app_state.game_inst,(f32)delta)){
                 PANCAKE_FATAL("Game Redner failed shutting down !");
                 app_state.is_running = FALSE;
                 break;
+            }
+            renderer_packet packet;
+            packet.delta_time = delta;
+            renderer_draw_frame(&packet);
+
+            //figure out how long the frame took, and if bleow
+            f64 frame_end_time = platform_get_absolute_time();
+            f64 frame_elapsed_time = frame_end_time - frame_start_time;
+            running_time += frame_elapsed_time;
+            f64 remaining_seconds = target_frame_seconds - frame_elapsed_time;
+
+            if(remaining_seconds > 0){
+                u64 remaining_ms = (remaining_seconds * 1000);
+
+                //if there is time lef, give it back to the OS
+                b8 limit_frames = FALSE;
+                if(remaining_ms > 0 && limit_frames){
+                    platform_sleep(remaining_ms - 1);
+                }
+
+                frame_count++;
             }
 
             // NOTE: Input update/state copying should always be handled
             // after any input should be recorded; I.E. before this line.
             // As a safety, input is the last thing to be updated before
             // this frame ends.
-            inputs_update(0);
+            inputs_update(delta);
+
+            app_state.last_time = current_time;
         }
     }
 
@@ -113,9 +154,10 @@ b8 application_run(){
     unregister_event(EVENT_CODE_KEY_PRESSED,0,application_on_key);
     unregister_event(EVENT_CODE_KEY_RELEASED,0,application_on_key);
 
-    event_shutdown();
-    inputs_shatdown();
-    platform_shutdown(&app_state.platform);
+    shutdown_event();
+    shutdown_inputs();
+    shutdown_renderer();
+    shutdown_platform(&app_state.platform);
 
     return TRUE;
 }
@@ -123,7 +165,7 @@ b8 application_run(){
 b8 application_on_event(u16 code, void* sender, void* listener_inst, event_context context) {
     switch (code) {
         case EVENT_CODE_APPLICATION_QUIT: {
-            PANCAKE_INFO("EVENT_CODE_APPLICATION_QUIT recieved, shutting down.\n");
+            PANCAKE_INFO("EVENT_CODE_APPLICATION_QUIT recieved, shutting down.");
             app_state.is_running = FALSE;
             return TRUE;
         }

@@ -25,7 +25,7 @@ typedef struct event_system_state{
 static b8 is_initialized = FALSE;
 static event_system_state state;
 
-b8 event_initialize(){
+b8 initialize_evnets(){
     if(is_initialized == TRUE){
         return FALSE;
     }
@@ -35,7 +35,7 @@ b8 event_initialize(){
     return TRUE;
 }
 
-void event_shutdown(){
+void shutdown_event(){
     //free the events arrays, the objects pointed at should be destroyed on there own
     for(u64 i=0; i < MAX_MESSAGE_CODES; ++i){
         if(state.registered[i].events != 0){
