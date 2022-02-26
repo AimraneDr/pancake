@@ -1,5 +1,6 @@
 #include "vulkan_backend.h"
 #include "vulkan_types.inl"
+#include "vulkan_device.h"
 #include "core/logger.h"
 #include "core/pancake_string.h"
 #include "containers/list.h"
@@ -98,7 +99,7 @@ b8 vulkan_renderer_backende_initialize(struct renderer_backend* backend, const c
     u32 log_severity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT |
                        VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
                        VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT;  //|
-                                                                      //    VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT;
+                     //VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT;
 
     VkDebugUtilsMessengerCreateInfoEXT debug_create_info = {VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT};
     debug_create_info.messageSeverity = log_severity;
@@ -132,10 +133,38 @@ b8 vulkan_renderer_backende_initialize(struct renderer_backend* backend, const c
 
     PANCAKE_INFO("Vulkan Instance created.");
 
+    //create surface
+    PANCAKE_DEBUG("Create vulkan surface...");
+    if(!platform_vulkan_surface_create(plat_state, &context)){
+        PANCAKE_ERROR("Failed to create vulkan surface !");
+        return FALSE;
+    }
+    PANCAKE_DEBUG("Vulkan surface created successfully");
+
+    //create device
+    if(!vulkan_device_create(&context)){
+        PANCAKE_ERROR("Failed to create device !");
+        return FALSE;
+    }
+
     PANCAKE_INFO("Vulkan renderer initialized successfully");
     return TRUE;
 }
 void vulkan_renderer_backende_shutdown(struct renderer_backend* backend){
+    //Destroy in the opposit order of creation
+
+    PANCAKE_DEBUG("Destroying Vulkan Device...");
+    vulkan_device_destroy(&context);
+
+    PANCAKE_DEBUG("Destroying Vulkan Surface...");
+    if(context.surface){
+        vkDestroySurfaceKHR(context.instance, context.surface,context.allocator);
+        context.surface = 0;
+        PANCAKE_DEBUG("Vulkan Surface Destroyed");
+    }
+
+    PANCAKE_DEBUG("destroying vulkan instance...");
+    vkDestroyInstance(context.instance, context.allocator);
 
 #if defined(_DEBUG)
     PANCAKE_DEBUG("destroying vulkan debugger...");
@@ -145,9 +174,6 @@ void vulkan_renderer_backende_shutdown(struct renderer_backend* backend){
         func(context.instance, context.debug_messenger, context.allocator);
     }
 #endif
-
-    PANCAKE_DEBUG("destroying vulkan instance...");
-    vkDestroyInstance(context.instance, context.allocator);
 }
 
 void vulkan_renderer_backende_resize(struct renderer_backend* backend, u16 width, u16 height){

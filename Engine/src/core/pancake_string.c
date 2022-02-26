@@ -2,6 +2,13 @@
 #include "core/pancake_memory.h"
 
 #include <string.h>
+#include <stdio.h>
+#include <stdarg.h>
+#include <ctype.h>   // isspace
+
+#ifndef _MSC_VER
+#include <strings.h>
+#endif
 
 u64 string_length(const char* str) {
     return strlen(str);
