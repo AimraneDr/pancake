@@ -1,6 +1,7 @@
 #include "vulkan_backend.h"
 #include "vulkan_types.inl"
 #include "vulkan_device.h"
+#include "vulkan_swapchain.h"
 #include "core/logger.h"
 #include "core/pancake_string.h"
 #include "containers/list.h"
@@ -16,9 +17,13 @@ VKAPI_ATTR VkBool32 VKAPI_CALL vk_debug_callback(
     const VkDebugUtilsMessengerCallbackDataEXT* callback_data,
     void* user_data) ;
 
+i32 find_memory_index(u32 type_filter, u32 property_flags);
 
 b8 vulkan_renderer_backende_initialize(struct renderer_backend* backend, const char* application_name, struct platform_state* plat_state){
     
+    //function pointer
+    context.find_memory_index = find_memory_index;
+
     //TODO: costum allocator.
     context.allocator = 0;
     
@@ -147,24 +152,34 @@ b8 vulkan_renderer_backende_initialize(struct renderer_backend* backend, const c
         return FALSE;
     }
 
+    //create Swapchain
+    vulkan_swapchain_create(
+        &context,
+        context.framebuffer_width,
+        context.framebuffer_height,
+        &context.swapchain
+    );
+
     PANCAKE_INFO("Vulkan renderer initialized successfully");
     return TRUE;
 }
 void vulkan_renderer_backende_shutdown(struct renderer_backend* backend){
     //Destroy in the opposit order of creation
 
+    //destroy swapchain
+    vulkan_swapchain_destroy(&context, &context.swapchain);
+    PANCAKE_DEBUG("vulkan swapchain had benn destroyed successfully");
+
     PANCAKE_DEBUG("Destroying Vulkan Device...");
     vulkan_device_destroy(&context);
+    PANCAKE_DEBUG("vulkan Device had benn destroyed successfully");
 
     PANCAKE_DEBUG("Destroying Vulkan Surface...");
     if(context.surface){
         vkDestroySurfaceKHR(context.instance, context.surface,context.allocator);
         context.surface = 0;
-        PANCAKE_DEBUG("Vulkan Surface Destroyed");
+        PANCAKE_DEBUG("vulkan Surface had benn destroyed successfully");
     }
-
-    PANCAKE_DEBUG("destroying vulkan instance...");
-    vkDestroyInstance(context.instance, context.allocator);
 
 #if defined(_DEBUG)
     PANCAKE_DEBUG("destroying vulkan debugger...");
@@ -172,8 +187,14 @@ void vulkan_renderer_backende_shutdown(struct renderer_backend* backend){
         PFN_vkDestroyDebugUtilsMessengerEXT func =
             (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(context.instance, "vkDestroyDebugUtilsMessengerEXT");
         func(context.instance, context.debug_messenger, context.allocator);
+        PANCAKE_DEBUG("vulkan debugger had benn destroyed successfully");
     }
 #endif
+
+    PANCAKE_DEBUG("destroying vulkan instance...");
+    vkDestroyInstance(context.instance, context.allocator);
+    PANCAKE_DEBUG("vulkan instance had benn destroyed successfully");
+
 }
 
 void vulkan_renderer_backende_resize(struct renderer_backend* backend, u16 width, u16 height){
@@ -208,4 +229,19 @@ VKAPI_ATTR VkBool32 VKAPI_CALL vk_debug_callback(
             break;
     }
     return VK_FALSE;
-} 
+}
+
+i32 find_memory_index(u32 type_filter, u32 property_flags){
+    VkPhysicalDeviceMemoryProperties memory_properties;
+    vkGetPhysicalDeviceMemoryProperties(context.device.physical_device, &memory_properties);
+
+    for(u32 i=0; i < memory_properties.memoryTypeCount; ++i){
+        //check each memory type to see if the bit is set to 1
+        if(type_filter & (1 << i) && (memory_properties.memoryTypes[i].propertyFlags & property_flags) == property_flags){
+            return 1;
+        }
+    }
+
+    PANCAKE_WARN("Unable to find a suitable memory type !");
+    return -1;
+}

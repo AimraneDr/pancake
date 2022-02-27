@@ -183,6 +183,33 @@ void vulkan_device_destroy(vulkan_context* context){
     context->device.compute_queue_index = -1;
 }
 
+b8 vulkan_device_detect_depth_format(vulkan_device* device){
+    //format cadidates
+    const u32 condidates_count = 3;
+    VkFormat condidates[3] = {
+        VK_FORMAT_D32_SFLOAT,
+        VK_FORMAT_D32_SFLOAT_S8_UINT,
+        VK_FORMAT_D24_UNORM_S8_UINT
+    };
+
+    u32 flags = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
+
+    for(u32 i=0; i < condidates_count; ++i){
+        VkFormatProperties properties;
+        vkGetPhysicalDeviceFormatProperties(device->physical_device, condidates[i], &properties);
+
+        if((properties.linearTilingFeatures & flags) == flags){
+            device->depth_format = condidates[i];
+            return TRUE;
+        }else if((properties.optimalTilingFeatures & flags) == flags){
+            device->depth_format = condidates[i];
+            return TRUE;
+        }
+    }
+
+    return FALSE;
+}
+
 void vulkan_device_query_swapchain_support(VkPhysicalDevice physical_device, VkSurfaceKHR surface, vulkan_swapchain_support_info* out_swapchain_info){
     //surface capabilities
     VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physical_device, surface, &out_swapchain_info->capabilities));
