@@ -40,13 +40,17 @@ b8 vulkan_device_create(vulkan_context* context){
     //NOTE: do not create additional queues for shared indices
     b8 present_shared_graphics_queue = context->device.graphics_queue_index == context->device.present_queue_index;
     b8 transfer_shared_graphics_queue = context->device.graphics_queue_index == context->device.transfer_queue_index;
+    b8 transfer_shares_present_queue = context->device.transfer_queue_index == context->device.present_queue_index;
     u32 index_count = 1;
 
     if(!present_shared_graphics_queue){
         index_count++;
     }
-     if(!transfer_shared_graphics_queue){
+    if(!transfer_shared_graphics_queue){
         index_count++;
+    }
+    if(!transfer_shares_present_queue){
+        index_count--;
     }
 
     u32 indeces[index_count];
@@ -55,7 +59,7 @@ b8 vulkan_device_create(vulkan_context* context){
     if(!present_shared_graphics_queue){
         indeces[index++] = context->device.present_queue_index;
     }
-     if(!transfer_shared_graphics_queue){
+     if(!transfer_shared_graphics_queue && !transfer_shares_present_queue){
         indeces[index++] = context->device.transfer_queue_index;
     }
 

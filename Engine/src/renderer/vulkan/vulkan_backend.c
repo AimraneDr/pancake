@@ -2,6 +2,7 @@
 #include "vulkan_types.inl"
 #include "vulkan_device.h"
 #include "vulkan_swapchain.h"
+#include "vulkan_renderpass.h"
 #include "core/logger.h"
 #include "core/pancake_string.h"
 #include "containers/list.h"
@@ -160,11 +161,23 @@ b8 vulkan_renderer_backende_initialize(struct renderer_backend* backend, const c
         &context.swapchain
     );
 
+    //create renderpass
+    vulkan_renderpass_create(
+        &context,
+        &context.main_renderpass,
+        0, 0, context.framebuffer_width, context.framebuffer_height,
+        0.0f, 0.0f, 0.2f, 1.0f,
+        1.0f,
+        0
+    );
+
     PANCAKE_INFO("Vulkan renderer initialized successfully");
     return TRUE;
 }
 void vulkan_renderer_backende_shutdown(struct renderer_backend* backend){
     //Destroy in the opposit order of creation
+
+    vulkan_renderpass_destroy(&context, &context.main_renderpass);
 
     //destroy swapchain
     vulkan_swapchain_destroy(&context, &context.swapchain);

@@ -6,6 +6,7 @@
 
 #include "core/logger.h"
 #include "core/inputs.h"
+#include "core/event.h"
 #include "containers/list.h"
 
 #include <Windows.h>
@@ -217,6 +218,8 @@ LRESULT CALLBACK win32_process_message(HWND hwnd,u32 msg,WPARAM w_param,LPARAM l
             return 1;
         case WM_CLOSE:
             //TODO: fire an event for the application to quit .
+            event_context data = {};
+            fire_event(EVENT_CODE_APPLICATION_QUIT, 0, data);
             return 0;
         case WM_DESTROY:
             PostQuitMessage(0);
