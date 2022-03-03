@@ -28,7 +28,11 @@ void shutdown_renderer(){
 }
 
 void renderer_on_resize(u16 width, u16 height){
-
+    if(backend){
+        backend->resize(backend, width, height);
+    }else{
+        PANCAKE_WARN("renderer backend does not exist to accept resize : %i , %i" ,width, height);
+    }
 }
 
 b8 renderer_begin_frame(f32 delta_time){

@@ -25,3 +25,5 @@ typedef struct ApplicationConfig{
 
 PANCAKE_API b8 application_create(struct game* game_inst);
 PANCAKE_API b8 application_run();
+
+void application_get_frame_buffer_size(u32* width, u32* height);

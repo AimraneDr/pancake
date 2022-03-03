@@ -25,7 +25,7 @@ static application_state app_state;
 
 b8 application_on_event(u16 code, void* sender, void* listener_inst, event_context context);
 b8 application_on_key(u16 code, void* sender, void* listener_inst, event_context context);
-
+b8 application_on_resize(u16 code, void* sender, void* listner_inst, event_context context);
 
 b8 application_create(game* game_inst){
     if(initialized){
@@ -48,9 +48,10 @@ b8 application_create(game* game_inst){
     }
     
     //listen for events...
-    register_event(EVENT_CODE_APPLICATION_QUIT,0,application_on_event);
-    register_event(EVENT_CODE_KEY_PRESSED,0,application_on_key);
-    register_event(EVENT_CODE_KEY_RELEASED,0,application_on_key);
+    register_event(EVENT_CODE_APPLICATION_QUIT, 0, application_on_event);
+    register_event(EVENT_CODE_KEY_PRESSED, 0, application_on_key);
+    register_event(EVENT_CODE_KEY_RELEASED, 0, application_on_key);
+    register_event(EVENT_CODE_RESIZED, 0, application_on_resize);
 
     if(!platform_startup(
             &app_state.platform,
@@ -162,6 +163,11 @@ b8 application_run(){
     return TRUE;
 }
 
+void application_get_frame_buffer_size(u32* width, u32* height){
+    *width = app_state.width;
+    *height = app_state.height;
+}
+
 b8 application_on_event(u16 code, void* sender, void* listener_inst, event_context context) {
     switch (code) {
         case EVENT_CODE_APPLICATION_QUIT: {
@@ -199,5 +205,35 @@ b8 application_on_key(u16 code, void* sender, void* listener_inst, event_context
             PANCAKE_DEBUG("'%c' key released in window.", key_code);
         }
     }
+    return FALSE;
+}
+b8 application_on_resize(u16 code, void* sender, void* listner_inst, event_context context){
+    if(code == EVENT_CODE_RESIZED){
+        u16 width = context.data.u16[0];
+        u16 height = context.data.u16[1];
+
+        //check if defferent , if so fire an resize event
+        if(width != app_state.width || height != app_state.height){
+            app_state.width = width;
+            app_state.height = height;
+
+            PANCAKE_DEBUG("resize occured : width = %i , height = %i .", width, height);
+        }
+
+        //handle minimization
+        if(width == 0 || height == 0){
+            PANCAKE_INFO("Window minimized, suspend application.");
+            app_state.is_suspended = TRUE;
+            return TRUE;
+        } else {
+            if(app_state.is_suspended){
+                PANCAKE_INFO("Window restored, resuming application.");
+            }
+            app_state.game_inst->OnResize(app_state.game_inst, width, height);
+            renderer_on_resize(width, height);
+        }
+    }
+
+    //event porpusely not handled to allow otherlistners to get this
     return FALSE;
 }

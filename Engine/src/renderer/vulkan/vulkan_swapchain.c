@@ -68,6 +68,8 @@ void vulkan_swapchain_present(
     }else if(result != VK_SUCCESS){
         PANCAKE_FATAL("Failed to present swapcahin image !");
     }
+    //increament (and loop) the index
+    context->current_frame = (context->current_frame + 1) % swapchain->max_frames_in_flight;
 }
 
 void create(vulkan_context* context, u32 width, u32 height, vulkan_swapchain* swapchain){
@@ -208,6 +210,7 @@ void create(vulkan_context* context, u32 width, u32 height, vulkan_swapchain* sw
 }
 
 void destroy(vulkan_context* context, vulkan_swapchain* swapchain){
+    vkDeviceWaitIdle(context->device.logical_device);
     vulkan_image_destroy(context, &swapchain->depth_attachment);
 
     //only destroy the views not the images, since those are owned by the swapchain and are thus when it is
