@@ -100,3 +100,12 @@ STATIC_ASSERT(sizeof(f64) == 8, "Expected f64 to be 8 bytes.");
 
 #define PANCAKE_CLAMP(value, min, max) (value <= min) ? min : (value >= max) ? max \
                                                                             : value;
+
+// Inlining
+#ifdef _MSC_VER
+#define PANCAKE_INLINE __forceinline
+#define PANCAKE_NOINLINE __declspec(noinline)
+#else
+#define PANCAKE_INLINE static inline
+#define PANCAKE_NOINLINE
+#endif 
