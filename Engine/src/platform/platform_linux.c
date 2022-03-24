@@ -65,7 +65,7 @@ b8 platform_startup(
 
     if (xcb_connection_has_error(state->connection)) {
         PANCAKE_FATAL("Failed to connect to X server via XCB.");
-        return FALSE;
+        return false;
     }
 
     // Get data from the X server
@@ -165,10 +165,10 @@ b8 platform_startup(
     i32 stream_result = xcb_flush(state->connection);
     if (stream_result <= 0) {
         PANCAKE_FATAL("An error occurred when flusing the stream: %d", stream_result);
-        return FALSE;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 void shutdown_platform(platform_state* plat_state) {
@@ -188,7 +188,7 @@ b8 platform_pump_messages(platform_state* plat_state) {
     xcb_generic_event_t* event;
     xcb_client_message_event_t* cm;
 
-    b8 quit_flagged = FALSE;
+    b8 quit_flagged = false;
 
     // Poll for events until null is returned.
     while (event != 0) {
@@ -264,7 +264,7 @@ b8 platform_pump_messages(platform_state* plat_state) {
 
                 // Window close
                 if (cm->data.data32[0] == state->wm_delete_win) {
-                    quit_flagged = TRUE;
+                    quit_flagged = true;
                 }
             } break;
             default:
@@ -344,11 +344,11 @@ b8 platform_create_vulkan_surface(platform_state *plat_state, vulkan_context *co
         &state->surface);
     if (result != VK_SUCCESS) {
         KFATAL("Vulkan surface creation failed.");
-        return FALSE;
+        return false;
     }
 
     context->surface = state->surface;
-    return TRUE;
+    return true;
 }
 
 

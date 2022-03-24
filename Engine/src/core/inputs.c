@@ -21,7 +21,7 @@ typedef struct input_state{
 } input_state;
 
 //internal state
-static b8 initialized = FALSE;
+static b8 initialized = false;
 static input_state state = {};
 
 //inplementations
@@ -29,12 +29,12 @@ static input_state state = {};
 void initialize_inputs(){
     //actully we don't have zero out memory for state because it is a static var and it is zeroed by default
     pancake_zero_memory(&state,sizeof(input_state));
-    initialized = TRUE;
+    initialized = true;
     PANCAKE_INFO("Inputs system had been intialized .");
 }
 void shutdown_inputs(){
     //TODO: shutdown routines when needed
-    initialized = FALSE;
+    initialized = false;
 }
 void inputs_update(f64 delta_time){
     if(!initialized) return;
@@ -46,24 +46,24 @@ void inputs_update(f64 delta_time){
 
 //keyboar inputs
 PANCAKE_API b8 input_key_is_down(keys key){
-    if(!initialized) return FALSE;
+    if(!initialized) return false;
 
-    return state.keyboard_current.keys[key] == TRUE;
+    return state.keyboard_current.keys[key] == true;
 }
 PANCAKE_API b8 input_key_is_up(keys key){
-    if(!initialized) return TRUE;
+    if(!initialized) return true;
 
-    return state.keyboard_current.keys[key] == FALSE;
+    return state.keyboard_current.keys[key] == false;
 }
 PANCAKE_API b8 input_key_was_down(keys key){
-    if(!initialized) return FALSE;
+    if(!initialized) return false;
 
-    return state.keyboard_previous.keys[key] == TRUE;
+    return state.keyboard_previous.keys[key] == true;
 }
 PANCAKE_API b8 input_key_was_up(keys key){
-    if(!initialized) return TRUE;
+    if(!initialized) return true;
 
-    return state.keyboard_previous.keys[key] == FALSE;
+    return state.keyboard_previous.keys[key] == false;
 }
 
 void input_process_key(keys key, b8 pressed){
@@ -82,24 +82,24 @@ void input_process_key(keys key, b8 pressed){
 
 //mouse inputs
 PANCAKE_API b8 input_mouse_button_is_down(m_buttons button){
-    if(!initialized) return FALSE;
+    if(!initialized) return false;
 
-    return state.mouse_current.buttons[button] == TRUE;
+    return state.mouse_current.buttons[button] == true;
 }
 PANCAKE_API b8 input_mouse_button_is_up(m_buttons button){
-    if(!initialized) return TRUE;
+    if(!initialized) return true;
 
-    return state.mouse_current.buttons[button] == FALSE;
+    return state.mouse_current.buttons[button] == false;
 }
 PANCAKE_API b8 input_mouse_button_was_down(m_buttons button){
-    if(!initialized) return FALSE;
+    if(!initialized) return false;
 
-    return state.mouse_previous.buttons[button] == TRUE;
+    return state.mouse_previous.buttons[button] == true;
 }
 PANCAKE_API b8 input_mouse_button_was_up(m_buttons button){
-    if(!initialized) return TRUE;
+    if(!initialized) return true;
 
-    return state.mouse_previous.buttons[button] == FALSE;
+    return state.mouse_previous.buttons[button] == false;
 }
 PANCAKE_API void input_mouse_get_position(f32* x, f32* y){
     if(!initialized){

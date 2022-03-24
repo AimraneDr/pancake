@@ -29,31 +29,31 @@ void shutdown_event();
 
 /*
     Register to listen for when events are sent with the provided code.
-    Events with a duplicated listener/Callback combos will not be registered again and so, the return value will be FALSE
+    Events with a duplicated listener/Callback combos will not be registered again and so, the return value will be false
     @param code : the event code to listen for
     @param listener : a pointer to a listener instance, can be 0/NULL
     @param on_event : the Callback function pointer to be invoked when the event code is fired
-    @return TRUE if the event is successfully registered, Otherwise FALSE
+    @return true if the event is successfully registered, Otherwise false
 */
 PANCAKE_API b8 register_event(u16 code, void* listener, on_event_fnp on_event);
 
 /*
     Unregister from listening for when events are sent with the provided code.
-    If no matching registration is found the return value will be FALSE
+    If no matching registration is found the return value will be false
     @param code : the event code to stop listening for
     @param listener : a pointer to a listener instance, can be 0/NULL
     @param on_event : the Callback function pointer to be unregistered
-    @return TRUE if the event is successfully unregistered, Otherwise FALSE
+    @return true if the event is successfully unregistered, Otherwise false
 */
 PANCAKE_API b8 unregister_event(u16 code, void* listener, on_event_fnp on_event);
 
 /*
     Fire an event to listeners of the given code .
-    If an event handler returns TRUE, the event is considered handled and is not passed on to any mor listeners. 
+    If an event handler returns true, the event is considered handled and is not passed on to any mor listeners. 
     @param code : the event code to fire .
     @param sender : a pointer to the sender, can be 0/NULL .
     @param context : the event data .
-    @return TRUE if handled, Otherwise FALSE
+    @return true if handled, Otherwise false
 */
 PANCAKE_API b8 fire_event(u16 code, void* sender, event_context context);
 

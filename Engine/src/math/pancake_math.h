@@ -223,14 +223,14 @@ PANCAKE_INLINE Vector2 Vec2_normalized(Vector2 vector) {
  */
 PANCAKE_INLINE b8 Vec2_compare(Vector2 vector_0, Vector2 vector_1, f32 tolerance) {
     if (pancake_abs(vector_0.x - vector_1.x) > tolerance) {
-        return FALSE;
+        return false;
     }
 
     if (pancake_abs(vector_0.y - vector_1.y) > tolerance) {
-        return FALSE;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 /**
@@ -495,18 +495,18 @@ PANCAKE_INLINE Vector3 vec3_cross(Vector3 vector_0, Vector3 vector_1) {
  */
 PANCAKE_INLINE const b8 vec3_compare(Vector3 vector_0, Vector3 vector_1, f32 tolerance) {
     if (pancake_abs(vector_0.x - vector_1.x) > tolerance) {
-        return FALSE;
+        return false;
     }
 
     if (pancake_abs(vector_0.y - vector_1.y) > tolerance) {
-        return FALSE;
+        return false;
     }
 
     if (pancake_abs(vector_0.z - vector_1.z) > tolerance) {
-        return FALSE;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 /**

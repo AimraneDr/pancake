@@ -53,7 +53,7 @@ b8 platform_startup(platform_state *plat_state, char* application_name, i32 x, i
     //Register window class
     if(!RegisterClassA(&wc)){
         MessageBoxA(0,"Window Register Failed","Error",MB_ICONEXCLAMATION | MB_OK);
-        return FALSE;
+        return false;
     }
 
     //create window
@@ -93,7 +93,7 @@ b8 platform_startup(platform_state *plat_state, char* application_name, i32 x, i
     if(handle == 0){
         MessageBoxA(0,"Window Register Failed","Error",MB_ICONEXCLAMATION | MB_OK);
         PANCAKE_FATAL("Window Register Failed");
-        return FALSE;
+        return false;
     }else{
         state->hwnd = handle;
     }
@@ -111,7 +111,7 @@ b8 platform_startup(platform_state *plat_state, char* application_name, i32 x, i
     clock_frequency = 1.0 / (f64)frequency.QuadPart;
     QueryPerformanceCounter(&start_time);
 
-    return TRUE;
+    return true;
 }
 
 void shutdown_platform(platform_state *plat_state){
@@ -129,7 +129,7 @@ b8 platform_pump_messages(platform_state* state){
         TranslateMessage(&message);
         DispatchMessage(&message);
     }
-    return TRUE;
+    return true;
 }
 
 void *platform_allocate(u64 size,b8 aligned){
@@ -203,11 +203,11 @@ b8 platform_vulkan_surface_create(struct platform_state* plat_state, struct vulk
     VkResult result = vkCreateWin32SurfaceKHR(context->instance, &create_info, context->allocator, &state->surface);
     if(result != VK_SUCCESS){
         PANCAKE_FATAL("Faild_to_create_vulkan_surface !");
-        return FALSE;
+        return false;
     }
 
     context->surface = state->surface;
-    return TRUE;
+    return true;
 }
 
 

@@ -48,7 +48,7 @@ void* pancake_allocate(u64 size, memory_tag tag){
     stats.tagged_allocations[tag] += size;
 
     //TODO: memory alignement
-    void* block = platform_allocate(size,FALSE);
+    void* block = platform_allocate(size,false);
     platform_zero_memory(block, size);
     return block;
 }
@@ -60,7 +60,7 @@ void pancake_free(void* block, u64 size, memory_tag tag){
     stats.tagged_allocations[tag] -= size;
 
     //TODO: memory alignement
-    platform_free(block, FALSE);
+    platform_free(block, false);
 }
 void* pancake_zero_memory(void* block, u64 size){
     return platform_zero_memory(block,size);

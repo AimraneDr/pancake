@@ -23,10 +23,10 @@ char* string_duplicate(const char* str) {
 
 
 b8 strings_equal(const char* str0, const char* str1){
-    // b8 result = TRUE;
+    // b8 result = true;
     // for(int i=0;i < string_length(str0);i++){
     //     if(str0[i] != str1[i]){
-    //         result  = FALSE;
+    //         result  = false;
     //         break;
     //     }
     // }
