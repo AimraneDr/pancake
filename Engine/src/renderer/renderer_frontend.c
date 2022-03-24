@@ -16,11 +16,11 @@ b8 initialize_renderer(const char* application_name, struct platform_state* plat
 
     if(!backend->initialize(backend,application_name,plat_state)){
         PANCAKE_FATAL("Rendeerer backend failed to initialize , shutting down...");
-        return FALSE;
+        return false;
     }
 
 
-    return TRUE;
+    return true;
 }
 void shutdown_renderer(){
     backend->shutdown(backend);
@@ -52,9 +52,9 @@ b8 renderer_draw_frame(renderer_packet* packet){
         b8 result = renderer_end_frame(packet->delta_time);
         if(!result){
             PANCAKE_FATAL("renderer_end_frame faild, application shutting down...");
-            return FALSE;
+            return false;
         }
     }
 
-    return TRUE;
+    return true;
 }

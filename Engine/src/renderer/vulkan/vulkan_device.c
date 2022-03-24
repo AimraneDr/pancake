@@ -34,7 +34,7 @@ b8 physical_device_meets_requirements(
 
 b8 vulkan_device_create(vulkan_context* context){
     
-    if(!select_physical_device(context)) return FALSE;
+    if(!select_physical_device(context)) return false;
 
     PANCAKE_INFO("Creating Logical Device...");
     //NOTE: do not create additional queues for shared indices
@@ -140,7 +140,7 @@ b8 vulkan_device_create(vulkan_context* context){
     VK_CHECK(vkCreateCommandPool(context->device.logical_device, &pool_create_info, context->allocator, &context->device.graphics_command_pool));
     PANCAKE_INFO("Graphics Command Pool Had Been Craeted Successfully.");
 
-    return TRUE;
+    return true;
 }
 
 void vulkan_device_destroy(vulkan_context* context){
@@ -215,14 +215,14 @@ b8 vulkan_device_detect_depth_format(vulkan_device* device){
 
         if((properties.linearTilingFeatures & flags) == flags){
             device->depth_format = condidates[i];
-            return TRUE;
+            return true;
         }else if((properties.optimalTilingFeatures & flags) == flags){
             device->depth_format = condidates[i];
-            return TRUE;
+            return true;
         }
     }
 
-    return FALSE;
+    return false;
 }
 
 void vulkan_device_query_swapchain_support(VkPhysicalDevice physical_device, VkSurfaceKHR surface, vulkan_swapchain_support_info* out_swapchain_info){
@@ -255,7 +255,7 @@ b8 select_physical_device(vulkan_context* context){
     VK_CHECK(vkEnumeratePhysicalDevices(context->instance, &physical_devices_count, 0));
     if(physical_devices_count == 0){
         PANCAKE_FATAL("No device wich support Vulkan Were found !");
-        return FALSE;
+        return false;
     }
 
     VkPhysicalDevice physical_devices[physical_devices_count];
@@ -273,13 +273,13 @@ b8 select_physical_device(vulkan_context* context){
 
         //TODO: this requirement should be driven by the engine configuration
         vulkan_physical_device_requirements requirements = {};
-        requirements.graphics = TRUE;
-        requirements.present = TRUE;
-        requirements.transfer = TRUE;
+        requirements.graphics = true;
+        requirements.present = true;
+        requirements.transfer = true;
         //NOTE: enable compute when it is required
-        requirements.compute = TRUE;
-        requirements.sampler_anisotropy = TRUE;
-        //requirements.discrete_gpu = TRUE;
+        requirements.compute = true;
+        requirements.sampler_anisotropy = true;
+        //requirements.discrete_gpu = true;
         requirements.device_extensions_names = list_create(const char*);
         list_push(requirements.device_extensions_names, &VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 
@@ -357,11 +357,11 @@ b8 select_physical_device(vulkan_context* context){
     //Ensure a device was selected
     if(!context->device.physical_device){
         PANCAKE_ERROR("No Devices Wich Meets Requirements Wrer Found");
-        return FALSE;
+        return false;
     }
 
     PANCAKE_INFO("Physical Devise Is Selected.");
-    return TRUE;
+    return true;
 }
 
 b8 physical_device_meets_requirements(
@@ -383,7 +383,7 @@ b8 physical_device_meets_requirements(
     if(requirements->discrete_gpu){
         if(properties->deviceType != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU){
             PANCAKE_INFO("Device is not a discrete GPU, Discrete GPU is required. Skipping.");
-            return FALSE;
+            return false;
         }
     }
 
@@ -457,7 +457,7 @@ b8 physical_device_meets_requirements(
             }
 
             PANCAKE_INFO("Required swapchain support not present, skipping device.");
-            return FALSE;
+            return false;
         }
 
         //device extensions
@@ -471,11 +471,11 @@ b8 physical_device_meets_requirements(
                 
                 u32 required_extensions_count = list_length(requirements->device_extensions_names);
                 for(u32 i=0; i < required_extensions_count; ++i){
-                    b8 found = FALSE;
+                    b8 found = false;
 
                     for(u32 j=0; j < available_extensions_count; ++j){
                         if(strings_equal(requirements->device_extensions_names[i], available_extensions[j].extensionName)){
-                            found = TRUE;
+                            found = true;
                             break;
                         }
                     }
@@ -483,7 +483,7 @@ b8 physical_device_meets_requirements(
                     if(!found){
                         PANCAKE_INFO("required extension ' %s ' not found, skipping device", requirements->device_extensions_names[i]);
                         pancake_free(available_extensions, sizeof(VkExtensionProperties) * available_extensions_count, MEMORY_TAG_RENDERER);
-                        return FALSE;
+                        return false;
                     }
                 }
             }
@@ -493,13 +493,13 @@ b8 physical_device_meets_requirements(
         //sampler anisotropy
         if(requirements->sampler_anisotropy && !features->samplerAnisotropy){
             PANCAKE_INFO("device does not support SamplerAnisotropy, skipping device.");
-            return FALSE;
+            return false;
         }
 
 
         //device meets all requirements
-        return TRUE;
+        return true;
     }
 
-    return FALSE;
+    return false;
 }

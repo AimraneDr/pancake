@@ -98,10 +98,10 @@ b8 vulkan_renderer_backende_initialize(renderer_backend* backend, const char* ap
     // Verify all required layers are available.
     for (u32 i = 0; i < required_validation_layers_count; ++i) {
         PANCAKE_INFO("Searching for layer: %s...", required_validation_layers_names[i]);
-        b8 found = FALSE;
+        b8 found = false;
         for (u32 j = 0; j < available_layer_count; ++j) {
             if (strings_equal(required_validation_layers_names[i], available_layers[j].layerName)) {
-                found = TRUE;
+                found = true;
                 PANCAKE_INFO("Found.");
                 break;
             }
@@ -110,7 +110,7 @@ b8 vulkan_renderer_backende_initialize(renderer_backend* backend, const char* ap
 
         if (!found) {
             PANCAKE_FATAL("Required validation layer is missing: %s", required_validation_layers_names[i]);
-            return FALSE;
+            return false;
         }
     }
     PANCAKE_INFO("All required validation layers are present.");
@@ -161,14 +161,14 @@ b8 vulkan_renderer_backende_initialize(renderer_backend* backend, const char* ap
     PANCAKE_DEBUG("Create vulkan surface...");
     if(!platform_vulkan_surface_create(plat_state, &context)){
         PANCAKE_ERROR("Failed to create vulkan surface !");
-        return FALSE;
+        return false;
     }
     PANCAKE_DEBUG("Vulkan surface created successfully");
 
     //create device
     if(!vulkan_device_create(&context)){
         PANCAKE_ERROR("Failed to create device !");
-        return FALSE;
+        return false;
     }
 
     //create Swapchain
@@ -208,7 +208,7 @@ b8 vulkan_renderer_backende_initialize(renderer_backend* backend, const char* ap
 
         //create a fence in a signaled state, indecating thet the first frane has already been "rendered".
         //this will prevent the application from waitin indefinitely for the first frame to render since it cannot be rendered until a frame is rendered before it.
-        vulkan_fence_create(&context, TRUE, &context.in_flight_fence[i]);
+        vulkan_fence_create(&context, true, &context.in_flight_fence[i]);
     }
 
     //in flight fence should not yet exist at this point, so clear the list.
@@ -220,7 +220,7 @@ b8 vulkan_renderer_backende_initialize(renderer_backend* backend, const char* ap
     }
 
     PANCAKE_INFO("Vulkan renderer initialized successfully");
-    return TRUE;
+    return true;
 }
 void vulkan_renderer_backende_shutdown(struct renderer_backend* backend){
     vkDeviceWaitIdle(context.device.logical_device);
@@ -323,35 +323,35 @@ b8 vulkan_renderer_backende_begin_frame(struct renderer_backend* backend, f32 de
     if(context.recreating_swapchain){
         VkResult result = vkDeviceWaitIdle(device->logical_device);
         if(!vulkan_result_is_success(result)){
-            PANCAKE_ERROR("vulkan_renderer_backende_begin_frame vkDeviceWaitIdle (1) failed : '%s'", vulkan_result_string(result, TRUE));
-            return FALSE;
+            PANCAKE_ERROR("vulkan_renderer_backende_begin_frame vkDeviceWaitIdle (1) failed : '%s'", vulkan_result_string(result, true));
+            return false;
         }
         PANCAKE_INFO("recreating swapchain.");
-        return FALSE;
+        return false;
     }
 
     //check if the framebuffer had been resized, if so a new swapchain must be created
     if(context.frame_buffer_size_generation != context.frame_buffer_size_last_generation){
         VkResult result = vkDeviceWaitIdle(device->logical_device);
         if(!vulkan_result_is_success(result)){
-            PANCAKE_ERROR("vulkan_renderer_backende_begin_frame vkDeviceWaitIdle (2) failed : '%s'", vulkan_result_string(result, TRUE));
-            return FALSE;
+            PANCAKE_ERROR("vulkan_renderer_backende_begin_frame vkDeviceWaitIdle (2) failed : '%s'", vulkan_result_string(result, true));
+            return false;
         }
 
         //if swapchain recreation failed (because for example the window is minimized)
         //boot out before unsetting the flag
         if(!recreate_swapchain(backend)){
-            return FALSE;
+            return false;
         }
 
         PANCAKE_INFO("resized, booting out");
-        return FALSE;
+        return false;
     }
 
     //wait for the excution of the current frame to complete. the fence being free will allow this one to move on
     if(!vulkan_fence_wait(&context, &context.in_flight_fence[context.current_frame], UINT64_MAX)){
         PANCAKE_ERROR("in-flight fence wait failure!");
-        return FALSE;
+        return false;
     }
 
     //aquire the next image from the swapchain. Pass along the semaphore that should be signaled when this complete.
@@ -364,13 +364,13 @@ b8 vulkan_renderer_backende_begin_frame(struct renderer_backend* backend, f32 de
         0,
         &context.image_index
     )){
-        return FALSE;
+        return false;
     }
 
     //begin recording commands
     vulkan_command_buffer* command_buffer = &context.graphics_command_buffers[context.image_index];
     vulkan_command_buffer_reset(command_buffer);
-    vulkan_command_buffer_begin(command_buffer, FALSE, FALSE, FALSE);
+    vulkan_command_buffer_begin(command_buffer, false, false, false);
 
     //dynamic state
     VkViewport view_port;
@@ -397,7 +397,7 @@ b8 vulkan_renderer_backende_begin_frame(struct renderer_backend* backend, f32 de
     vulkan_renderpass_begin(command_buffer, &context.main_renderpass, context.swapchain.frame_buffers[context.image_index].handle);
 
 
-    return TRUE;
+    return true;
 }
 
 
@@ -446,8 +446,8 @@ b8 vulkan_renderer_backende_end_frame(struct renderer_backend* backend, f32 delt
 
     VkResult result = vkQueueSubmit(context.device.graphics_queue, 1, &submit_info, context.in_flight_fence[context.current_frame].handle);
     if(result != VK_SUCCESS){
-        PANCAKE_ERROR("vkQueueSubmit failed with result : %s", vulkan_result_string(result, TRUE));
-        return FALSE;
+        PANCAKE_ERROR("vkQueueSubmit failed with result : %s", vulkan_result_string(result, true));
+        return false;
     }
 
     vulkan_command_buffer_update_submitted(command_buffer);
@@ -463,7 +463,7 @@ b8 vulkan_renderer_backende_end_frame(struct renderer_backend* backend, f32 delt
         context.image_index
     );
 
-    return TRUE;
+    return true;
 }
 
 VKAPI_ATTR VkBool32 VKAPI_CALL vk_debug_callback(
@@ -517,7 +517,7 @@ void create_command_buffers(renderer_backend* backend){
             vulkan_command_buffer_free(&context, context.device.graphics_command_pool, &context.graphics_command_buffers[i]);
         }
         pancake_zero_memory(&context.graphics_command_buffers[i], sizeof(VkCommandBuffer));
-        vulkan_command_buffer_allocate(&context, context.device.graphics_command_pool, TRUE, &context.graphics_command_buffers[i]);
+        vulkan_command_buffer_allocate(&context, context.device.graphics_command_pool, true, &context.graphics_command_buffers[i]);
     }
 
     PANCAKE_INFO("Vulkan Command Buffer(s) had been craeted successfully.");
@@ -548,17 +548,17 @@ b8 recreate_swapchain(renderer_backend* backend){
     // If already being recreated, do not try again.
     if (context.recreating_swapchain) {
         PANCAKE_DEBUG("recreate_swapchain called when already recreating. Booting.");
-        return FALSE;
+        return false;
     }
 
     // Detect if the window is too small to be drawn to
     if (context.framebuffer_width == 0 || context.framebuffer_height == 0) {
         PANCAKE_DEBUG("recreate_swapchain called when window is < 1 in a dimension. Booting.");
-        return FALSE;
+        return false;
     }
 
     // Mark as recreating if the dimensions are valid.
-    context.recreating_swapchain = TRUE;
+    context.recreating_swapchain = true;
 
     // Wait for any operations to complete.
     vkDeviceWaitIdle(context.device.logical_device);
@@ -612,7 +612,7 @@ b8 recreate_swapchain(renderer_backend* backend){
     create_command_buffers(backend);
 
     // Clear the recreating flag.
-    context.recreating_swapchain = FALSE;
+    context.recreating_swapchain = false;
 
-    return TRUE;
+    return true;
 }
