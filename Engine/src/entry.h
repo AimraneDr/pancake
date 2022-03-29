@@ -12,9 +12,6 @@ extern b8 create_game(game* out_game);
     The Main Entry Point of The Application
 */
 int main(void) {
-
-    initialize_memory();
-
     //request the game instance from the application
     game game_inst;
     if(!create_game(&game_inst)){
@@ -39,7 +36,5 @@ int main(void) {
          PANCAKE_FATAL("Application did not shutdown greacfully !");
         return 2;
     }
-
-    shutdown_memory();
     return 0;
 }

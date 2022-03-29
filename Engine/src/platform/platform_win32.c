@@ -18,34 +18,129 @@
 #include "vulkan/vulkan_win32.h"
 #include "renderer/vulkan/vulkan_types.inl"
 
-typedef struct internal_state{
+typedef struct platform_state{
     HINSTANCE h_instance;
     HWND hwnd;
     VkSurfaceKHR surface;
-}internal_state;
+    //clock
+    f64 clock_frequency;
+    LARGE_INTEGER start_time;
+}platform_state;
 
-//clock
-static f64 clock_frequency;
-static LARGE_INTEGER start_time;
+
+static platform_state* state_ptr;
 
 LRESULT CALLBACK win32_process_message(HWND hwnd,u32 msg,WPARAM w_param,LPARAM l_param);
 
-b8 platform_startup(platform_state *plat_state, char* application_name, i32 x, i32 y, i32 width, i32 height){
-    
-    plat_state->internal_state = malloc(sizeof(internal_state));
-    internal_state *state = (internal_state *)plat_state->internal_state;
+//b8 platform_system_startup(platform_state *plat_state, char* application_name, i32 x, i32 y, i32 width, i32 height){
+//
+//     plat_state->internal_state = malloc(sizeof(internal_state));
+//     internal_state *state = (internal_state *)plat_state->internal_state;
+//
+//     state->h_instance=GetModuleHandleA(0);
+//
+//     //setup window class
+//     HICON icon = LoadIcon(state->h_instance,IDI_APPLICATION);
+//     WNDCLASSA wc;
+//     memset(&wc,0,sizeof(wc));
+//     wc.style = CS_DBLCLKS; // double clicks
+//     wc.lpfnWndProc = win32_process_message;
+//     wc.cbClsExtra = 0;
+//     wc.cbWndExtra = 0;
+//     wc.hInstance = state->h_instance;
+//     wc.hIcon = icon;
+//     wc.hCursor = LoadCursor(NULL,IDC_ARROW);
+//     wc.hbrBackground = NULL;    //Transparent
+//     wc.lpszClassName = "Pancake_window_class";
+//     //Register window class
+//     if(!RegisterClassA(&wc)){
+//         MessageBoxA(0,"Window Register Failed","Error",MB_ICONEXCLAMATION | MB_OK);
+//         return false;
+//     }
+//
+//     //create window
+//     u32 client_x =x;
+//     u32 client_y =y;
+//     u32 client_width =width;
+//     u32 client_height=height;
+//
+//     u32 window_x =client_x;
+//     u32 window_y =client_y;
+//     u32 window_width =client_width;
+//     u32 window_height=client_height;
+//
+//     u32 window_style = WS_OVERLAPPED | WS_SYSMENU | WS_CAPTION;
+//     u32 window_ex_style = WS_EX_APPWINDOW;
+//
+//     window_style |= WS_MAXIMIZEBOX;
+//     window_style |= WS_MINIMIZEBOX;
+//     window_style |= WS_THICKFRAME;
+//
+//     //Optain the size of the border
+//     RECT border_rect = {0,0,0,0};
+//     AdjustWindowRectEx(&border_rect,window_style,0,window_ex_style);
+//
+//     window_x += border_rect.left;
+//     window_y += border_rect.top;
+//
+//     window_width += border_rect.right - border_rect.left;
+//     window_height += border_rect.bottom - border_rect.top;
+//
+//     HWND handle = CreateWindowExA(
+//         window_ex_style,"Pancake_window_class",application_name,
+//         window_style,window_x,window_y,window_width,window_height,
+//         0,0,state->h_instance,0
+//     );
+//
+//     if(handle == 0){
+//         MessageBoxA(0,"Window Register Failed","Error",MB_ICONEXCLAMATION | MB_OK);
+//         PANCAKE_FATAL("Window Register Failed");
+//         return false;
+//     }else{
+//         state->hwnd = handle;
+//     }
+//
+//     //show the window
+//     b32 should_activate = 1;    // TODO: if the window should not accept inputs this should be false
+//     i32 show_window_command_flags = should_activate ? SW_SHOW : SW_SHOWNOACTIVATE;
+//     // if initially minimized use SW_MINIMIZE : SW_SHOWMINNOACTIVATE
+//     // if initially maximized use SW_SHOWMAXIMIZED : SW_MAXIMIZE  
+//     ShowWindow(state->hwnd,show_window_command_flags);
+//
+//     //set clock
+//     LARGE_INTEGER frequency;
+//     QueryPerformanceFrequency(&frequency);
+//     clock_frequency = 1.0 / (f64)frequency.QuadPart;
+//     QueryPerformanceCounter(&start_time);
+//
+//     return true;
+// }
 
-    state->h_instance=GetModuleHandleA(0);
+b8 platform_system_startup(
+    u64* memory_requirement,
+    void* state,
+    const char* application_name,
+    i32 x,
+    i32 y,
+    i32 width,
+    i32 height){
+    
+    *memory_requirement = sizeof(platform_state);
+    if (state == 0) {
+        return true;
+    }
+    state_ptr = state;
+    state_ptr->h_instance = GetModuleHandleA(0);
 
     //setup window class
-    HICON icon = LoadIcon(state->h_instance,IDI_APPLICATION);
+    HICON icon = LoadIcon(state_ptr->h_instance,IDI_APPLICATION);
     WNDCLASSA wc;
     memset(&wc,0,sizeof(wc));
     wc.style = CS_DBLCLKS; // double clicks
     wc.lpfnWndProc = win32_process_message;
     wc.cbClsExtra = 0;
     wc.cbWndExtra = 0;
-    wc.hInstance = state->h_instance;
+    wc.hInstance = state_ptr->h_instance;
     wc.hIcon = icon;
     wc.hCursor = LoadCursor(NULL,IDC_ARROW);
     wc.hbrBackground = NULL;    //Transparent
@@ -87,7 +182,7 @@ b8 platform_startup(platform_state *plat_state, char* application_name, i32 x, i
     HWND handle = CreateWindowExA(
         window_ex_style,"Pancake_window_class",application_name,
         window_style,window_x,window_y,window_width,window_height,
-        0,0,state->h_instance,0
+        0,0,state_ptr->h_instance,0
     );
 
     if(handle == 0){
@@ -95,7 +190,7 @@ b8 platform_startup(platform_state *plat_state, char* application_name, i32 x, i
         PANCAKE_FATAL("Window Register Failed");
         return false;
     }else{
-        state->hwnd = handle;
+        state_ptr->hwnd = handle;
     }
 
     //show the window
@@ -103,31 +198,31 @@ b8 platform_startup(platform_state *plat_state, char* application_name, i32 x, i
     i32 show_window_command_flags = should_activate ? SW_SHOW : SW_SHOWNOACTIVATE;
     // if initially minimized use SW_MINIMIZE : SW_SHOWMINNOACTIVATE
     // if initially maximized use SW_SHOWMAXIMIZED : SW_MAXIMIZE  
-    ShowWindow(state->hwnd,show_window_command_flags);
+    ShowWindow(state_ptr->hwnd,show_window_command_flags);
 
     //set clock
     LARGE_INTEGER frequency;
     QueryPerformanceFrequency(&frequency);
-    clock_frequency = 1.0 / (f64)frequency.QuadPart;
-    QueryPerformanceCounter(&start_time);
+    state_ptr->clock_frequency = 1.0 / (f64)frequency.QuadPart;
+    QueryPerformanceCounter(&state_ptr->start_time);
 
     return true;
 }
 
-void shutdown_platform(platform_state *plat_state){
-    internal_state *state = (internal_state *)plat_state->internal_state;
-
-    if(state->hwnd){
-        DestroyWindow(state->hwnd);
-        state->hwnd = 0;
+void platform_system_shutdown(void* plat_state){
+    if(state_ptr && state_ptr->hwnd){
+        DestroyWindow(state_ptr->hwnd);
+        state_ptr->hwnd = 0;
     }
 }
 
-b8 platform_pump_messages(platform_state* state){
-    MSG message;
-    while(PeekMessageA(&message,NULL,0,0,PM_REMOVE)){
-        TranslateMessage(&message);
-        DispatchMessage(&message);
+b8 platform_pump_messages(){
+    if(state_ptr){
+        MSG message;
+        while(PeekMessageA(&message,NULL,0,0,PM_REMOVE)){
+            TranslateMessage(&message);
+            DispatchMessage(&message);
+        }
     }
     return true;
 }
@@ -178,9 +273,11 @@ void platform_console_write_error(const char* msg, u8 colour){
 }
 
 f64 platform_get_absolute_time(){
+    if(state_ptr){
     LARGE_INTEGER now_time;
     QueryPerformanceCounter(&now_time);
-    return (f64) now_time.QuadPart * clock_frequency;
+    return (f64) now_time.QuadPart * state_ptr->clock_frequency;
+    } return 0;
 }
 
 void platform_sleep(u64 ms){
@@ -192,21 +289,22 @@ void platform_get_required_extensions(const char ***names_list){
 }
 
 //create surface for vulkan
-b8 platform_vulkan_surface_create(struct platform_state* plat_state, struct vulkan_context* context){
-    //simply cold-cast to the known type.
-    internal_state *state = (internal_state *)plat_state->internal_state;
+b8 platform_vulkan_surface_create(struct vulkan_context* context){
+    if (!state_ptr) {
+        return false;
+    }
 
     VkWin32SurfaceCreateInfoKHR create_info =  {VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR};
-    create_info.hinstance = state->h_instance;
-    create_info.hwnd = state->hwnd;
+    create_info.hinstance = state_ptr->h_instance;
+    create_info.hwnd = state_ptr->hwnd;
 
-    VkResult result = vkCreateWin32SurfaceKHR(context->instance, &create_info, context->allocator, &state->surface);
+    VkResult result = vkCreateWin32SurfaceKHR(context->instance, &create_info, context->allocator, &state_ptr->surface);
     if(result != VK_SUCCESS){
         PANCAKE_FATAL("Faild_to_create_vulkan_surface !");
         return false;
     }
 
-    context->surface = state->surface;
+    context->surface = state_ptr->surface;
     return true;
 }
 

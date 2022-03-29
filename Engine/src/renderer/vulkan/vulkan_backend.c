@@ -32,7 +32,7 @@ void regenerate_frame_buffers(renderer_backend* backend, vulkan_swapchain* swapc
 
 b8 recreate_swapchain(renderer_backend* backend);
 
-b8 vulkan_renderer_backende_initialize(renderer_backend* backend, const char* application_name, struct platform_state* plat_state){
+b8 vulkan_renderer_backende_initialize(struct renderer_backend* backend, const char* application_name){
     
     //function pointer
     context.find_memory_index = find_memory_index;
@@ -159,7 +159,7 @@ b8 vulkan_renderer_backende_initialize(renderer_backend* backend, const char* ap
 
     //create surface
     PANCAKE_DEBUG("Create vulkan surface...");
-    if(!platform_vulkan_surface_create(plat_state, &context)){
+    if(!platform_vulkan_surface_create(&context)){
         PANCAKE_ERROR("Failed to create vulkan surface !");
         return false;
     }

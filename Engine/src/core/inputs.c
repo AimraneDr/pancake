@@ -20,57 +20,60 @@ typedef struct input_state{
     mouse_state mouse_previous;
 } input_state;
 
-//internal state
-static b8 initialized = false;
-static input_state state = {};
+// Internal input state pointer
+static input_state* state_ptr;
 
 //inplementations
 
-void initialize_inputs(){
+void initialize_inputs(u64* memory_requirement, void* state){
+    *memory_requirement = sizeof(input_state);
+    if (state == 0) {
+        return;
+    }
     //actully we don't have zero out memory for state because it is a static var and it is zeroed by default
-    pancake_zero_memory(&state,sizeof(input_state));
-    initialized = true;
+    pancake_zero_memory(state,sizeof(input_state));
+    state_ptr = state;
     PANCAKE_INFO("Inputs system had been intialized .");
 }
-void shutdown_inputs(){
+void shutdown_inputs(void* state){
     //TODO: shutdown routines when needed
-    initialized = false;
+    state_ptr = 0;
 }
 void inputs_update(f64 delta_time){
-    if(!initialized) return;
+    if(!state_ptr) return;
     
     //copy current states to previous states
-    pancake_copy_memory(&state.keyboard_previous,&state.keyboard_current,sizeof(keyboard_state));
-    pancake_copy_memory(&state.mouse_previous,&state.mouse_current,sizeof(mouse_state));
+    pancake_copy_memory(&state_ptr->keyboard_previous,&state_ptr->keyboard_current,sizeof(keyboard_state));
+    pancake_copy_memory(&state_ptr->mouse_previous,&state_ptr->mouse_current,sizeof(mouse_state));
 }
 
 //keyboar inputs
 PANCAKE_API b8 input_key_is_down(keys key){
-    if(!initialized) return false;
+    if(!state_ptr) return false;
 
-    return state.keyboard_current.keys[key] == true;
+    return state_ptr->keyboard_current.keys[key] == true;
 }
 PANCAKE_API b8 input_key_is_up(keys key){
-    if(!initialized) return true;
+    if(!state_ptr) return true;
 
-    return state.keyboard_current.keys[key] == false;
+    return state_ptr->keyboard_current.keys[key] == false;
 }
 PANCAKE_API b8 input_key_was_down(keys key){
-    if(!initialized) return false;
+    if(!state_ptr) return false;
 
-    return state.keyboard_previous.keys[key] == true;
+    return state_ptr->keyboard_previous.keys[key] == true;
 }
 PANCAKE_API b8 input_key_was_up(keys key){
-    if(!initialized) return true;
+    if(!state_ptr) return true;
 
-    return state.keyboard_previous.keys[key] == false;
+    return state_ptr->keyboard_previous.keys[key] == false;
 }
 
 void input_process_key(keys key, b8 pressed){
     //only handle this if the state had been changed.
-    if(state.keyboard_current.keys[key] != pressed){
+    if(state_ptr->keyboard_current.keys[key] != pressed){
         //update internal state
-        state.keyboard_current.keys[key] = pressed;
+        state_ptr->keyboard_current.keys[key] = pressed;
 
         //fire off an event for immediate processing
         event_context context;
@@ -82,50 +85,50 @@ void input_process_key(keys key, b8 pressed){
 
 //mouse inputs
 PANCAKE_API b8 input_mouse_button_is_down(m_buttons button){
-    if(!initialized) return false;
+    if(!state_ptr) return false;
 
-    return state.mouse_current.buttons[button] == true;
+    return state_ptr->mouse_current.buttons[button] == true;
 }
 PANCAKE_API b8 input_mouse_button_is_up(m_buttons button){
-    if(!initialized) return true;
+    if(!state_ptr) return true;
 
-    return state.mouse_current.buttons[button] == false;
+    return state_ptr->mouse_current.buttons[button] == false;
 }
 PANCAKE_API b8 input_mouse_button_was_down(m_buttons button){
-    if(!initialized) return false;
+    if(!state_ptr) return false;
 
-    return state.mouse_previous.buttons[button] == true;
+    return state_ptr->mouse_previous.buttons[button] == true;
 }
 PANCAKE_API b8 input_mouse_button_was_up(m_buttons button){
-    if(!initialized) return true;
+    if(!state_ptr) return true;
 
-    return state.mouse_previous.buttons[button] == false;
+    return state_ptr->mouse_previous.buttons[button] == false;
 }
 PANCAKE_API void input_mouse_get_position(f32* x, f32* y){
-    if(!initialized){
+    if(!state_ptr){
         *x = 0;
         *y = 0;
         return;
     }
 
-    *x = state.mouse_current.x;
-    *y = state.mouse_current.y;
+    *x = state_ptr->mouse_current.x;
+    *y = state_ptr->mouse_current.y;
 }
 PANCAKE_API void input_mouse_get_previous_position(f32* x, f32* y){
-    if(!initialized){
+    if(!state_ptr){
         *x = 0;
         *y = 0;
         return;
     }
 
-    *x = state.mouse_previous.x;
-    *y = state.mouse_previous.y;
+    *x = state_ptr->mouse_previous.x;
+    *y = state_ptr->mouse_previous.y;
 }
 
 void input_process_mouse_button(m_buttons button, b8 pressed){
     //if the state changed, fire an event
-    if(state.mouse_current.buttons[button] != pressed){
-        state.mouse_current.buttons[button] = pressed;
+    if(state_ptr->mouse_current.buttons[button] != pressed){
+        state_ptr->mouse_current.buttons[button] = pressed;
 
         //fire the event
         event_context context;
@@ -135,13 +138,13 @@ void input_process_mouse_button(m_buttons button, b8 pressed){
 }
 void input_process_mouse_move(i16 x, i16 y){
     //if the postion changed, fire an event
-    if(state.mouse_current.x != x || state.mouse_current.y != y ){
+    if(state_ptr->mouse_current.x != x || state_ptr->mouse_current.y != y ){
         //NOTE: enable this in debugging
         //PANCAKE_DEBUG("mouse postion => (%i , %i)", x, y);
 
         //update internal state
-        state.mouse_current.x = x;
-        state.mouse_current.y = y;
+        state_ptr->mouse_current.x = x;
+        state_ptr->mouse_current.y = y;
 
         //fire an event
         event_context context;

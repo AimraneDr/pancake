@@ -17,6 +17,8 @@ b8 create_game(game* out_game){
 
     //create the game state
     out_game->state = pancake_allocate(sizeof(game_state), MEMORY_TAG_GAME);
+    
+    out_game->application_state = 0;
 
     return true;
 }

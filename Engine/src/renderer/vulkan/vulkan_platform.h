@@ -5,7 +5,6 @@ struct platform_state;
 struct vulkan_context;
 
 b8 platform_vulkan_surface_create(
-    struct platform_state* state, 
     struct vulkan_context* context);
 
 

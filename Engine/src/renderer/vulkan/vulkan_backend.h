@@ -2,7 +2,7 @@
 
 #include "renderer/renderer_backend.h"
 
-b8 vulkan_renderer_backende_initialize(struct renderer_backend* backend, const char* application_name, struct platform_state* plat_state);
+b8 vulkan_renderer_backende_initialize(struct renderer_backend* backend, const char* application_name);
 void vulkan_renderer_backende_shutdown(struct renderer_backend* backend);
 
 void vulkan_renderer_backende_resize(struct renderer_backend* backend, u16 width, u16 height);

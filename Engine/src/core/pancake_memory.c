@@ -12,6 +12,7 @@ struct memory_stats{
 
 static const char* memory_tags_string[MEMORY_TAG_MAX_TAGS] = {
     "UNKNOWN            ",
+    "LINEAR_ALLOCATION  ",
     "ARRAY              ",
     "LIST               ",
     "DICT               ",
@@ -30,13 +31,25 @@ static const char* memory_tags_string[MEMORY_TAG_MAX_TAGS] = {
     "SCENE              "
 };
 
-static struct memory_stats stats;
+typedef struct memory_system_state{
+    struct memory_stats stats;
+    u64 allocations_count;
+}memory_system_state;
 
-void initialize_memory(){
-    platform_zero_memory(&stats,sizeof(stats));
+static memory_system_state* state_ptr;
+
+
+void initialize_memory(u64* required_memory, void* state){
+    *required_memory = sizeof(memory_system_state);
+    if(state == 0){
+        return;
+    }
+    state_ptr = state;
+    state_ptr->allocations_count = 0;
+    platform_zero_memory(&state_ptr->stats,sizeof(state_ptr->stats));
 }
-void shutdown_memory(){
-
+void shutdown_memory(void* state){
+    state_ptr = 0;
 }
 
 void* pancake_allocate(u64 size, memory_tag tag){
@@ -44,8 +57,11 @@ void* pancake_allocate(u64 size, memory_tag tag){
         PANCAKE_WARN("allocate called using MEMORY_TAG_UNKNOWN , Re-class this allocation");
     }
 
-    stats.total_allocated += size;
-    stats.tagged_allocations[tag] += size;
+    if(state_ptr){
+        state_ptr->stats.total_allocated += size;
+        state_ptr->stats.tagged_allocations[tag] += size;
+        state_ptr->allocations_count++;
+    }
 
     //TODO: memory alignement
     void* block = platform_allocate(size,false);
@@ -56,8 +72,10 @@ void pancake_free(void* block, u64 size, memory_tag tag){
     if(tag == MEMORY_TAG_UNKNOWN){
         PANCAKE_WARN("allocate called using MEMORY_TAG_UNKNOWN , Re-class this allocation");
     }
-    stats.total_allocated -= size;
-    stats.tagged_allocations[tag] -= size;
+    if(state_ptr){
+        state_ptr->stats.total_allocated -= size;
+        state_ptr->stats.tagged_allocations[tag] -= size;
+    }
 
     //TODO: memory alignement
     platform_free(block, false);
@@ -81,19 +99,19 @@ char* get_memory_usage_str(){
     for(i32 i=0; i < MEMORY_TAG_MAX_TAGS; ++i){
         char unit[3] = "Xb";
         float amount = 1.0f;
-        if(stats.tagged_allocations[i] >= Gb){
+        if(state_ptr->stats.tagged_allocations[i] >= Gb){
             unit[0] = 'G';
-            amount = stats.tagged_allocations[i] / (float)Gb;
-        }else if(stats.tagged_allocations[i] >= Mb){
+            amount = state_ptr->stats.tagged_allocations[i] / (float)Gb;
+        }else if(state_ptr->stats.tagged_allocations[i] >= Mb){
             unit[0] = 'M';
-            amount = stats.tagged_allocations[i] / (float)Mb;
-        }else if(stats.tagged_allocations[i] >= Kb){
+            amount = state_ptr->stats.tagged_allocations[i] / (float)Mb;
+        }else if(state_ptr->stats.tagged_allocations[i] >= Kb){
             unit[0] = 'K';
-            amount = stats.tagged_allocations[i] / (float)Kb;
+            amount = state_ptr->stats.tagged_allocations[i] / (float)Kb;
         }else{
             unit[0] = 'B';
             unit[1] = 0;
-            amount = stats.tagged_allocations[i];
+            amount = state_ptr->stats.tagged_allocations[i];
         }
         //snprintf() returns the number of character written
         //so we add the return value to our offset variable
@@ -102,4 +120,8 @@ char* get_memory_usage_str(){
 
     char* out_string = string_duplicate(buffer);
     return out_string;
+}
+u64 get_memory_allocations_count(){
+    if(state_ptr)   return state_ptr->allocations_count;
+    return 0;
 }

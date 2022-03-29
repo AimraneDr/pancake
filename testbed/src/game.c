@@ -1,5 +1,7 @@
 #include "game.h"
 #include <core/logger.h>
+#include <core/pancake_memory.h>
+#include <core\inputs.h>
 
 
 b8 game_initialize(game* game_inst){
@@ -8,6 +10,13 @@ b8 game_initialize(game* game_inst){
 }
 
 b8 game_update(game* game_inst,f32 delta_time){
+    
+    static u64 alloc_count = 0;
+    u64 previouse_alloc_count = alloc_count;
+    alloc_count = get_memory_allocations_count();
+    if(input_key_is_up('M') && input_key_was_down('M')){
+        PANCAKE_DEBUG("Allocations : %llu (%llu on this frame).", alloc_count, alloc_count - previouse_alloc_count);
+    }
     return true;
 }
 

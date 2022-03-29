@@ -53,6 +53,7 @@
         "renderer_frontend.h": "c",
         "tuple": "cpp",
         "utility": "cpp",
-        "cstring": "c"
+        "cstring": "c",
+        "vulkan_frame_buffer.h": "c"
     }
 } 
