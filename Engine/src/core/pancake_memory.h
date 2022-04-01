@@ -25,8 +25,8 @@ typedef enum memory_tag{
     MEMORY_TAG_MAX_TAGS
 }memory_tag;
 
-PANCAKE_API void initialize_memory(u64* required_memory, void* state);
-PANCAKE_API void shutdown_memory(void* state);
+PANCAKE_API void initialize_memory_system(u64* required_memory, void* state);
+PANCAKE_API void shutdown_memory_system(void* state);
 
 PANCAKE_API void* pancake_allocate(u64 size, memory_tag tag);
 PANCAKE_API void pancake_free(void* block, u64 size, memory_tag tag);

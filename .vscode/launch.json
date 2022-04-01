@@ -36,5 +36,6 @@
             "cwd": "${workspaceFolder}/bin/",
             "environment": [],
         }
+
     ]
 } 

@@ -10,7 +10,7 @@ typedef struct renderer_system_state {
 static renderer_system_state* state_ptr;
 
 
-b8 renderer_system_initialize(u64* memory_requirement, void* state, const char* application_name){
+b8 initialize_renderer_system(u64* memory_requirement, void* state, const char* application_name){
     *memory_requirement = sizeof(renderer_system_state);
     if (state == 0) {
         return true;
@@ -29,7 +29,7 @@ b8 renderer_system_initialize(u64* memory_requirement, void* state, const char* 
 
     return true;
 }
-void renderer_system_shutdown(void* state){
+void shutdown_renderer_system(void* state){
     if(state_ptr){
         state_ptr->backend.shutdown(&state_ptr->backend);
     }

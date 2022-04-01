@@ -25,7 +25,7 @@ static input_state* state_ptr;
 
 //inplementations
 
-void initialize_inputs(u64* memory_requirement, void* state){
+void initialize_inputs_system(u64* memory_requirement, void* state){
     *memory_requirement = sizeof(input_state);
     if (state == 0) {
         return;
@@ -35,7 +35,7 @@ void initialize_inputs(u64* memory_requirement, void* state){
     state_ptr = state;
     PANCAKE_INFO("Inputs system had been intialized .");
 }
-void shutdown_inputs(void* state){
+void shutdown_inputs_system(void* state){
     //TODO: shutdown routines when needed
     state_ptr = 0;
 }
@@ -70,10 +70,29 @@ PANCAKE_API b8 input_key_was_up(keys key){
 }
 
 void input_process_key(keys key, b8 pressed){
+
     //only handle this if the state had been changed.
-    if(state_ptr->keyboard_current.keys[key] != pressed){
+    if(state_ptr && state_ptr->keyboard_current.keys[key] != pressed){
         //update internal state
         state_ptr->keyboard_current.keys[key] = pressed;
+        
+        if (key == KEY_LALT) {
+            PANCAKE_INFO("Left alt %s.", pressed ? "pressed" : "released");
+        } else if (key == KEY_RALT) {
+            PANCAKE_INFO("Right alt %s.", pressed ? "pressed" : "released");
+        }
+
+        if (key == KEY_LCONTROL) {
+            PANCAKE_INFO("Left ctrl %s.", pressed ? "pressed" : "released");
+        } else if (key == KEY_RCONTROL) {
+            PANCAKE_INFO("Right ctrl %s.", pressed ? "pressed" : "released");
+        }
+
+        if (key == KEY_LSHIFT) {
+            PANCAKE_INFO("Left shift %s.", pressed ? "pressed" : "released");
+        } else if (key == KEY_RSHIFT) {
+            PANCAKE_INFO("Right shift %s.", pressed ? "pressed" : "released");
+        }
 
         //fire off an event for immediate processing
         event_context context;

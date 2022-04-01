@@ -39,7 +39,7 @@ typedef struct memory_system_state{
 static memory_system_state* state_ptr;
 
 
-void initialize_memory(u64* required_memory, void* state){
+void initialize_memory_system(u64* required_memory, void* state){
     *required_memory = sizeof(memory_system_state);
     if(state == 0){
         return;
@@ -48,7 +48,7 @@ void initialize_memory(u64* required_memory, void* state){
     state_ptr->allocations_count = 0;
     platform_zero_memory(&state_ptr->stats,sizeof(state_ptr->stats));
 }
-void shutdown_memory(void* state){
+void shutdown_memory_system(void* state){
     state_ptr = 0;
 }
 
@@ -115,7 +115,7 @@ char* get_memory_usage_str(){
         }
         //snprintf() returns the number of character written
         //so we add the return value to our offset variable
-        offset += snprintf(buffer + offset, 8000, "  %s : %.2f %s\n", memory_tags_string[i], amount, unit);
+        offset += snprintf(buffer + offset, 8000, "\t%s : %.2f %s\n", memory_tags_string[i], amount, unit);
     }
 
     char* out_string = string_duplicate(buffer);

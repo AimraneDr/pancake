@@ -1072,12 +1072,12 @@ PANCAKE_INLINE Vector3 mat4_down(Matrix4 matrix) {
  * @return A 3-component directional vector.
  */
 PANCAKE_INLINE Vector3 mat4_left(Matrix4 matrix) {
-    Vector3 right;
-    right.x = -matrix.data[0];
-    right.y = -matrix.data[4];
-    right.z = -matrix.data[8];
-    vec3_normalize(&right);
-    return right;
+    Vector3 left;
+    left.x = -matrix.data[0];
+    left.y = -matrix.data[4];
+    left.z = -matrix.data[8];
+    vec3_normalize(&left);
+    return left;
 }
 
 /**
@@ -1087,12 +1087,12 @@ PANCAKE_INLINE Vector3 mat4_left(Matrix4 matrix) {
  * @return A 3-component directional vector.
  */
 PANCAKE_INLINE Vector3 mat4_right(Matrix4 matrix) {
-    Vector3 left;
-    left.x = matrix.data[0];
-    left.y = matrix.data[4];
-    left.z = matrix.data[8];
-    vec3_normalize(&left);
-    return left;
+    Vector3 right;
+    right.x = matrix.data[0];
+    right.y = matrix.data[4];
+    right.z = matrix.data[8];
+    vec3_normalize(&right);
+    return right;
 }
 
 // ------------------------------------------

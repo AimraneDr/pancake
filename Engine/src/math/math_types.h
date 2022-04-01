@@ -13,14 +13,12 @@ typedef union Vector2_u{
 }Vector2;
 
 typedef struct Vector3_u{
+    f32 elements[3];
     union{
-        f32 elements[3];
-        union{
-            struct{ f32 x,y,z; };
-            struct{ f32 r,g,b; };
-            struct{ f32 s,t,p; };
-            struct{ f32 u,v,w; };
-        };
+        struct{ f32 x,y,z; };
+        struct{ f32 r,g,b; };
+        struct{ f32 s,t,p; };
+        struct{ f32 u,v,w; };
     };
 }Vector3;
 
@@ -38,3 +36,7 @@ typedef Vector4 quaternion;
 typedef union Matrix4_u{
     f32 data[16];
 }Matrix4;
+
+typedef struct vertex_3d{
+    Vector3 position;
+}vertex_3d;

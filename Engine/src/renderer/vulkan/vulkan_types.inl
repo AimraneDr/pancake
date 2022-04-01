@@ -9,6 +9,17 @@
         PANCAKE_ASSERT(expr == VK_SUCCESS); \
     }
 
+
+typedef struct vulkan_buffer{
+    u64 total_size;
+    VkBuffer handle;
+    VkBufferUsageFlagBits usage;
+    b8 is_locked;
+    VkDeviceMemory memory;
+    u32 memory_index;
+    u32 memory_property_flags;
+} vulkan_buffer;
+
 typedef struct vulkan_swapchain_support_info{
     VkSurfaceCapabilitiesKHR capabilities;
     u32 format_count;
@@ -107,6 +118,24 @@ typedef struct vulkan_swapchain{
     vulkan_frame_buffer* frame_buffers;
 }vulkan_swapchain;
 
+typedef struct vulkan_shader_stage{
+    VkShaderModuleCreateInfo create_info;
+    VkShaderModule handle;
+    VkPipelineShaderStageCreateInfo shader_stage_create_info;
+}vulkan_shader_stage;
+
+typedef struct vulkan_pipeline{
+    VkPipeline handle;
+    VkPipelineLayout pipeline_layout;
+}vulkan_pipeline;
+
+#define OBJECT_SHADER_STAGE_COUNT 2
+
+typedef struct vulkan_object_shader{
+    //vertex, fragment
+    vulkan_shader_stage stages[OBJECT_SHADER_STAGE_COUNT];
+    vulkan_pipeline pipeline;
+}vulkan_object_shader;
 
 typedef struct vulkan_context{
     
@@ -132,6 +161,9 @@ typedef struct vulkan_context{
     vulkan_swapchain swapchain;
     vulkan_renderpass main_renderpass;
 
+    vulkan_buffer object_vertex_buffer;
+    vulkan_buffer object_index_buffer;
+
     //list
     vulkan_command_buffer* graphics_command_buffers;
 
@@ -150,6 +182,11 @@ typedef struct vulkan_context{
     u32 current_frame;
 
     b8 recreating_swapchain;
+
+    vulkan_object_shader object_shader;
+
+    u64 geometry_vertex_offset;
+    u64 geometry_index_offset;
 
     i32 (*find_memory_index)(u32 type_filter, u32 property_flags);
 

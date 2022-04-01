@@ -151,8 +151,8 @@ typedef enum keys {
  * @param memory_requirement The required size of the state memory.
  * @param state Either 0 or the allocated block of state memory.
  */
-void initialize_inputs(u64* memory_requirement, void* state);
-void shutdown_inputs(void* state);
+void initialize_inputs_system(u64* memory_requirement, void* state);
+void shutdown_inputs_system(void* state);
 void inputs_update(f64 delta_time);
 
 //keyboard inputs

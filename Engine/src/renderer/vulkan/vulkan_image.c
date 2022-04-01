@@ -52,7 +52,7 @@ void vulkan_image_create(
 
     VK_CHECK(vkAllocateMemory(context->device.logical_device, &memory_allocate_info, context->allocator, &out_image->memory));
 
-    //bind the ,e,ory
+    //bind the memory
     VK_CHECK(vkBindImageMemory(context->device.logical_device, out_image->handle, out_image->memory, 0));   //TODO: Configurable memory offset
 
     //create view 

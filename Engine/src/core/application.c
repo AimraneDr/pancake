@@ -65,27 +65,27 @@ b8 application_create(game* game_inst){
 
 
     //initialize memory sub-system
-    initialize_memory(&app_state->memory_system_memory_requirement, 0);
+    initialize_memory_system(&app_state->memory_system_memory_requirement, 0);
     app_state->memory_system_state_ptr =  linear_allocator_allocate(&app_state->systems_allocator, app_state->memory_system_memory_requirement);
-    initialize_memory(&app_state->memory_system_memory_requirement, app_state->memory_system_state_ptr);
+    initialize_memory_system(&app_state->memory_system_memory_requirement, app_state->memory_system_state_ptr);
 
     //initialize logging sub-system
-    initialize_logging(&app_state->logging_system_memory_requirement, 0);
+    initialize_logging_system(&app_state->logging_system_memory_requirement, 0);
     app_state->logging_system_state_ptr =  linear_allocator_allocate(&app_state->systems_allocator, app_state->logging_system_memory_requirement);
-    if(!initialize_logging(&app_state->logging_system_memory_requirement, app_state->logging_system_state_ptr)){
+    if(!initialize_logging_system(&app_state->logging_system_memory_requirement, app_state->logging_system_state_ptr)){
         PANCAKE_ERROR("Failed to inintialize Logging System, Shutting Down...");
         return false;
     }
 
     //Initialize Input sub-system
-    initialize_inputs(&app_state->input_system_memory_requirement, 0);
+    initialize_inputs_system(&app_state->input_system_memory_requirement, 0);
     app_state->input_system_state_ptr = linear_allocator_allocate(&app_state->systems_allocator, app_state->input_system_memory_requirement);
-    initialize_inputs(&app_state->input_system_memory_requirement, app_state->input_system_state_ptr);
+    initialize_inputs_system(&app_state->input_system_memory_requirement, app_state->input_system_state_ptr);
 
     //initialize events sub-system
-    initialize_evnets(&app_state->event_system_memory_requirement, 0);
+    initialize_evnets_system(&app_state->event_system_memory_requirement, 0);
     app_state->event_system_state_ptr = linear_allocator_allocate(&app_state->systems_allocator, app_state->event_system_memory_requirement);
-    initialize_evnets(&app_state->event_system_memory_requirement, app_state->event_system_state_ptr);
+    initialize_evnets_system(&app_state->event_system_memory_requirement, app_state->event_system_state_ptr);
 
 
     
@@ -111,16 +111,11 @@ b8 application_create(game* game_inst){
     }
 
 
-    // //initialize the renderer
-    // if(!initialize_renderer(game_inst->config.name, &app_state->platform)){
-    //     PANCAKE_FATAL("Failed to initialize the renderer, Aborting application...");
-    //     return false;
-    // }
 
     // Renderer system
-    renderer_system_initialize(&app_state->renderer_system_memory_requirement, 0, 0);
+    initialize_renderer_system(&app_state->renderer_system_memory_requirement, 0, 0);
     app_state->renderer_system_state_ptr = linear_allocator_allocate(&app_state->systems_allocator, app_state->renderer_system_memory_requirement);
-    if (!renderer_system_initialize(&app_state->renderer_system_memory_requirement, app_state->renderer_system_state_ptr, game_inst->config.name)) {
+    if (!initialize_renderer_system(&app_state->renderer_system_memory_requirement, app_state->renderer_system_state_ptr, game_inst->config.name)) {
         PANCAKE_FATAL("Failed to initialize renderer. Aborting application.");
         return false;
     }
@@ -213,12 +208,12 @@ b8 application_run(){
     unregister_event(EVENT_CODE_KEY_PRESSED,0,application_on_key);
     unregister_event(EVENT_CODE_KEY_RELEASED,0,application_on_key);
 
-    shutdown_event(&app_state->event_system_state_ptr);
-    shutdown_inputs(&app_state->input_system_state_ptr);
-    shutdown_logging(&app_state->logging_system_state_ptr);
-    renderer_system_shutdown(&app_state->renderer_system_state_ptr);
+    shutdown_events_system(&app_state->event_system_state_ptr);
+    shutdown_inputs_system(&app_state->input_system_state_ptr);
+    shutdown_renderer_system(&app_state->renderer_system_state_ptr);
     platform_system_shutdown(&app_state->platform_system_state_ptr);
-    shutdown_memory(&app_state->memory_system_state_ptr);
+    shutdown_memory_system(&app_state->memory_system_state_ptr);
+    shutdown_logging_system(&app_state->logging_system_state_ptr);
 
     return true;
 }

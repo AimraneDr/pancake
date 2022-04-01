@@ -151,20 +151,20 @@ void vulkan_device_destroy(vulkan_context* context){
     context->device.compute_queue = 0;
 
     //Destroy command pool
-    PANCAKE_INFO("Destroying Command Pool.");
+    PANCAKE_DEBUG("Destroy Command Pool.");
     vkDestroyCommandPool(context->device.logical_device, context->device.graphics_command_pool, context->allocator);
 
     //destroy the logicsl device
-    PANCAKE_INFO("Destroying Logical Device...");
+    PANCAKE_DEBUG("Destroying Logical Device...");
     if(context->device.logical_device){
         vkDestroyDevice(context->device.logical_device, context->allocator);
         context->device.logical_device = 0;
-        PANCAKE_INFO("Logical Device Destroyed");
+        PANCAKE_DEBUG("Logical Device Destroyed");
     }
 
 
     //physical devices are not destroyable
-    PANCAKE_INFO("Releasing physical devaice resources...");
+    PANCAKE_DEBUG("Releasing physical devaice resources...");
     context->device.physical_device = 0;
 
     if(context->device.swapchain_support.formats){

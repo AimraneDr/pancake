@@ -22,7 +22,7 @@ typedef struct event_system_state{
 
 static event_system_state* state_ptr;
 
-void initialize_evnets(u64* memory_requirement, void* state){
+void initialize_evnets_system(u64* memory_requirement, void* state){
     *memory_requirement = sizeof(event_system_state);
     if(state == 0){
         return;
@@ -31,7 +31,7 @@ void initialize_evnets(u64* memory_requirement, void* state){
     state_ptr = state;
 }
 
-void shutdown_event(void* state){
+void shutdown_events_system(void* state){
     if(state_ptr){
         //free the events arrays, the objects pointed at should be destroyed on there own
         for(u64 i=0; i < MAX_MESSAGE_CODES; ++i){
