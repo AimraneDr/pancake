@@ -130,4 +130,4 @@ b8 vulkan_result_is_success(VkResult result) {
         case VK_ERROR_UNKNOWN:
             return false;
     }
-} 
+}

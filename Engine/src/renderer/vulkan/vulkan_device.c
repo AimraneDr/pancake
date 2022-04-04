@@ -348,7 +348,7 @@ b8 select_physical_device(vulkan_context* context){
 
             //keep a copy of properties, features and memory info for a later use.
             context->device.properties = properties;
-            context->device.featurs = features;
+            context->device.features = features;
             context->device.memory = memory_props;
 
             break;

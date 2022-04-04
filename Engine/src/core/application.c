@@ -218,7 +218,7 @@ b8 application_run(){
     return true;
 }
 
-void application_get_frame_buffer_size(u32* width, u32* height){
+void application_get_framebuffer_size(u32* width, u32* height){
     *width = app_state->width;
     *height = app_state->height;
 }
@@ -283,6 +283,7 @@ b8 application_on_resize(u16 code, void* sender, void* listner_inst, event_conte
         } else {
             if(app_state->is_suspended){
                 PANCAKE_INFO("Window restored, resuming application.");
+                app_state->is_suspended = false;
             }
             app_state->game_inst->OnResize(app_state->game_inst, width, height);
             renderer_on_resize(width, height);

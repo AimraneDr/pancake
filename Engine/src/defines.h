@@ -18,7 +18,7 @@ typedef double f64;
 
 // Boolean types
 typedef int b32;
-typedef char b8;
+typedef _Bool b8;
 
 // Properly define static assertions.
 #if defined(__clang__) || defined(__gcc__)
@@ -102,7 +102,10 @@ STATIC_ASSERT(sizeof(f64) == 8, "Expected f64 to be 8 bytes.");
                                                                             : value;
 
 // Inlining
-#ifdef _MSC_VER
+#if defined(__clang__) || defined(__gcc__)
+#define PANCAKE_INLINE __attribute__((always_inline)) inline
+#define PANCAKE_NOINLINE __attribute__((noinline))
+#elif defined(_MSC_VER)
 #define PANCAKE_INLINE __forceinline
 #define PANCAKE_NOINLINE __declspec(noinline)
 #else

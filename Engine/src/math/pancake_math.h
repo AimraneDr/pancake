@@ -2,46 +2,45 @@
 
 #include "defines.h"
 #include "math_types.h"
+
 #include "core/pancake_memory.h"
 
-
-#define PI                          3.14159265358979323846f
-#define PI_2                        2.0f * PI
-#define HALF_PI                     0.5f * PI
-#define QUARTER_PI                  0.25f * PI
-#define ONE_OVER_PI                 1.0f / PI
-#define ONE_OVER_TWO_PI             1.0f / PI_2
-#define SQRT_TWO                    1.41421356237309504880f
-#define SQRT_THREE                  1.73205080756887729352f
-#define SQRT_ONE_OVER_TWO           0.70710678118654752440f
-#define SQRT_ONE_OVER_THREE         0.57735026918962576450f
-#define DEG2RAD_MULTIPLIER          PI / 180.0f
-#define RAD2DEG_MULTIPLIER          180.0f / PI
+#define K_PI 3.14159265358979323846f
+#define K_PI_2 2.0f * K_PI
+#define K_HALF_PI 0.5f * K_PI
+#define K_QUARTER_PI 0.25f * K_PI
+#define K_ONE_OVER_PI 1.0f / K_PI
+#define K_ONE_OVER_TWO_PI 1.0f / K_PI_2
+#define K_SQRT_TWO 1.41421356237309504880f
+#define K_SQRT_THREE 1.73205080756887729352f
+#define K_SQRT_ONE_OVER_TWO 0.70710678118654752440f
+#define K_SQRT_ONE_OVER_THREE 0.57735026918962576450f
+#define K_DEG2RAD_MULTIPLIER K_PI / 180.0f
+#define K_RAD2DEG_MULTIPLIER 180.0f / K_PI
 
 // The multiplier to convert seconds to milliseconds.
-#define SEC_TO_MS_MULTIPLIER        1000.0f
+#define K_SEC_TO_MS_MULTIPLIER 1000.0f
 
 // The multiplier to convert milliseconds to seconds.
-#define MS_TO_SEC_MULTIPLIER        0.001f
+#define K_MS_TO_SEC_MULTIPLIER 0.001f
 
 // A huge number that should be larger than any valid number used.
-#define INFINITY                    1e30f
+#define K_INFINITY 1e30f
 
 // Smallest positive number where 1.0 + FLOAT_EPSILON != 0
-#define FLOAT_EPSILON               1.192092896e-07f
+#define K_FLOAT_EPSILON 1.192092896e-07f
 
-/*
-    GENERAL MATH FUNCTIONS
-*/
-PANCAKE_API f32 pancake_sin(f32 x);
-PANCAKE_API f32 pancake_cos(f32 x);
-PANCAKE_API f32 pancake_tan(f32 x);
-PANCAKE_API f32 pancake_acos(f32 x);
-PANCAKE_API f32 pancake_sqrt(f32 x);
-PANCAKE_API f32 pancake_abs(f32 x);
+// ------------------------------------------
+// General math functions
+// ------------------------------------------
+PANCAKE_API f32 ksin(f32 x);
+PANCAKE_API f32 kcos(f32 x);
+PANCAKE_API f32 ktan(f32 x);
+PANCAKE_API f32 kacos(f32 x);
+PANCAKE_API f32 ksqrt(f32 x);
+PANCAKE_API f32 kabs(f32 x);
 
-
-/*
+/**
  * Indicates if the value is a power of 2. 0 is considered _not_ a power of 2.
  * @param value The value to be interpreted.
  * @returns True if a power of 2, otherwise false.
@@ -50,13 +49,11 @@ PANCAKE_INLINE b8 is_power_of_2(u64 value) {
     return (value != 0) && ((value & (value - 1)) == 0);
 }
 
-PANCAKE_API i32 pancake_random();
-PANCAKE_API i32 pancake_random_in_range(i32 min, i32 max);
+PANCAKE_API i32 krandom();
+PANCAKE_API i32 krandom_in_range(i32 min, i32 max);
 
-PANCAKE_API f32 f_pancake_random();
-PANCAKE_API f32 f_pancake_random_in_range(f32 min, f32 max);
-
-
+PANCAKE_API f32 fkrandom();
+PANCAKE_API f32 fkrandom_in_range(f32 min, f32 max);
 
 // ------------------------------------------
 // Vector 2
@@ -69,8 +66,8 @@ PANCAKE_API f32 f_pancake_random_in_range(f32 min, f32 max);
  * @param y The y value.
  * @return A new 2-element vector.
  */
-PANCAKE_INLINE Vector2 Vec2_create(f32 x, f32 y) {
-    Vector2 out_vector;
+PANCAKE_INLINE vec2 vec2_create(f32 x, f32 y) {
+    vec2 out_vector;
     out_vector.x = x;
     out_vector.y = y;
     return out_vector;
@@ -79,43 +76,43 @@ PANCAKE_INLINE Vector2 Vec2_create(f32 x, f32 y) {
 /**
  * @brief Creates and returns a 2-component vector with all components set to 0.0f.
  */
-PANCAKE_INLINE Vector2 Vec2_zero() {
-    return (Vector2){0.0f, 0.0f};
+PANCAKE_INLINE vec2 vec2_zero() {
+    return (vec2){0.0f, 0.0f};
 }
 
 /**
  * @brief Creates and returns a 2-component vector with all components set to 1.0f.
  */
-PANCAKE_INLINE Vector2 Vec2_one() {
-    return (Vector2){1.0f, 1.0f};
+PANCAKE_INLINE vec2 vec2_one() {
+    return (vec2){1.0f, 1.0f};
 }
 
 /**
  * @brief Creates and returns a 2-component vector pointing up (0, 1).
  */
-PANCAKE_INLINE Vector2 Vec2_up() {
-    return (Vector2){0.0f, 1.0f};
+PANCAKE_INLINE vec2 vec2_up() {
+    return (vec2){0.0f, 1.0f};
 }
 
 /**
  * @brief Creates and returns a 2-component vector pointing down (0, -1).
  */
-PANCAKE_INLINE Vector2 Vec2_down() {
-    return (Vector2){0.0f, -1.0f};
+PANCAKE_INLINE vec2 vec2_down() {
+    return (vec2){0.0f, -1.0f};
 }
 
 /**
  * @brief Creates and returns a 2-component vector pointing left (-1, 0).
  */
-PANCAKE_INLINE Vector2 Vec2_left() {
-    return (Vector2){-1.0f, 0.0f};
+PANCAKE_INLINE vec2 vec2_left() {
+    return (vec2){-1.0f, 0.0f};
 }
 
 /**
  * @brief Creates and returns a 2-component vector pointing right (1, 0).
  */
-PANCAKE_INLINE Vector2 Vec2_right() {
-    return (Vector2){1.0f, 0.0f};
+PANCAKE_INLINE vec2 vec2_right() {
+    return (vec2){1.0f, 0.0f};
 }
 
 /**
@@ -125,8 +122,8 @@ PANCAKE_INLINE Vector2 Vec2_right() {
  * @param vector_1 The second vector.
  * @return The resulting vector. 
  */
-PANCAKE_INLINE Vector2 Vec2_add(Vector2 vector_0, Vector2 vector_1) {
-    return (Vector2){
+PANCAKE_INLINE vec2 vec2_add(vec2 vector_0, vec2 vector_1) {
+    return (vec2){
         vector_0.x + vector_1.x,
         vector_0.y + vector_1.y};
 }
@@ -138,8 +135,8 @@ PANCAKE_INLINE Vector2 Vec2_add(Vector2 vector_0, Vector2 vector_1) {
  * @param vector_1 The second vector.
  * @return The resulting vector. 
  */
-PANCAKE_INLINE Vector2 Vec2_sub(Vector2 vector_0, Vector2 vector_1) {
-    return (Vector2){
+PANCAKE_INLINE vec2 vec2_sub(vec2 vector_0, vec2 vector_1) {
+    return (vec2){
         vector_0.x - vector_1.x,
         vector_0.y - vector_1.y};
 }
@@ -151,8 +148,8 @@ PANCAKE_INLINE Vector2 Vec2_sub(Vector2 vector_0, Vector2 vector_1) {
  * @param vector_1 The second vector.
  * @return The resulting vector. 
  */
-PANCAKE_INLINE Vector2 Vec2_mul(Vector2 vector_0, Vector2 vector_1) {
-    return (Vector2){
+PANCAKE_INLINE vec2 vec2_mul(vec2 vector_0, vec2 vector_1) {
+    return (vec2){
         vector_0.x * vector_1.x,
         vector_0.y * vector_1.y};
 }
@@ -164,8 +161,8 @@ PANCAKE_INLINE Vector2 Vec2_mul(Vector2 vector_0, Vector2 vector_1) {
  * @param vector_1 The second vector.
  * @return The resulting vector. 
  */
-PANCAKE_INLINE Vector2 Vec2_div(Vector2 vector_0, Vector2 vector_1) {
-    return (Vector2){
+PANCAKE_INLINE vec2 vec2_div(vec2 vector_0, vec2 vector_1) {
+    return (vec2){
         vector_0.x / vector_1.x,
         vector_0.y / vector_1.y};
 }
@@ -176,7 +173,7 @@ PANCAKE_INLINE Vector2 Vec2_div(Vector2 vector_0, Vector2 vector_1) {
  * @param vector The vector to retrieve the squared length of.
  * @return The squared length.
  */
-PANCAKE_INLINE f32 Vec2_length_squared(Vector2 vector) {
+PANCAKE_INLINE f32 vec2_length_squared(vec2 vector) {
     return vector.x * vector.x + vector.y * vector.y;
 }
 
@@ -186,8 +183,8 @@ PANCAKE_INLINE f32 Vec2_length_squared(Vector2 vector) {
  * @param vector The vector to retrieve the length of.
  * @return The length.
  */
-PANCAKE_INLINE f32 Vec2_length(Vector2 vector) {
-    return pancake_sqrt(Vec2_length_squared(vector));
+PANCAKE_INLINE f32 vec2_length(vec2 vector) {
+    return ksqrt(vec2_length_squared(vector));
 }
 
 /**
@@ -195,8 +192,8 @@ PANCAKE_INLINE f32 Vec2_length(Vector2 vector) {
  * 
  * @param vector A pointer to the vector to be normalized.
  */
-PANCAKE_INLINE void Vec2_normalize(Vector2* vector) {
-    const f32 length = Vec2_length(*vector);
+PANCAKE_INLINE void vec2_normalize(vec2* vector) {
+    const f32 length = vec2_length(*vector);
     vector->x /= length;
     vector->y /= length;
 }
@@ -207,8 +204,8 @@ PANCAKE_INLINE void Vec2_normalize(Vector2* vector) {
  * @param vector The vector to be normalized.
  * @return A normalized copy of the supplied vector 
  */
-PANCAKE_INLINE Vector2 Vec2_normalized(Vector2 vector) {
-    Vec2_normalize(&vector);
+PANCAKE_INLINE vec2 vec2_normalized(vec2 vector) {
+    vec2_normalize(&vector);
     return vector;
 }
 
@@ -221,12 +218,12 @@ PANCAKE_INLINE Vector2 Vec2_normalized(Vector2 vector) {
  * @param tolerance The difference tolerance. Typically K_FLOAT_EPSILON or similar.
  * @return True if within tolerance; otherwise false. 
  */
-PANCAKE_INLINE b8 Vec2_compare(Vector2 vector_0, Vector2 vector_1, f32 tolerance) {
-    if (pancake_abs(vector_0.x - vector_1.x) > tolerance) {
+PANCAKE_INLINE b8 vec2_compare(vec2 vector_0, vec2 vector_1, f32 tolerance) {
+    if (kabs(vector_0.x - vector_1.x) > tolerance) {
         return false;
     }
 
-    if (pancake_abs(vector_0.y - vector_1.y) > tolerance) {
+    if (kabs(vector_0.y - vector_1.y) > tolerance) {
         return false;
     }
 
@@ -240,11 +237,11 @@ PANCAKE_INLINE b8 Vec2_compare(Vector2 vector_0, Vector2 vector_1, f32 tolerance
  * @param vector_1 The second vector.
  * @return The distance between vector_0 and vector_1.
  */
-PANCAKE_INLINE f32 Vec2_distance(Vector2 vector_0, Vector2 vector_1) {
-    Vector2 d = (Vector2){
+PANCAKE_INLINE f32 vec2_distance(vec2 vector_0, vec2 vector_1) {
+    vec2 d = (vec2){
         vector_0.x - vector_1.x,
         vector_0.y - vector_1.y};
-    return Vec2_length(d);
+    return vec2_length(d);
 }
 
 // ------------------------------------------
@@ -259,85 +256,86 @@ PANCAKE_INLINE f32 Vec2_distance(Vector2 vector_0, Vector2 vector_1) {
  * @param z The z value.
  * @return A new 3-element vector.
  */
-PANCAKE_INLINE Vector3 vec3_create(f32 x, f32 y, f32 z) {
-    return (Vector3){x, y, z};
+PANCAKE_INLINE vec3 vec3_create(f32 x, f32 y, f32 z) {
+    return (vec3){x, y, z};
 }
 
 /**
- * @brief Returns a new Vector3 containing the x, y and z components of the 
- * supplied Vector4, essentially dropping the w component.
+ * @brief Returns a new vec3 containing the x, y and z components of the 
+ * supplied vec4, essentially dropping the w component.
  * 
  * @param vector The 4-component vector to extract from.
- * @return A new Vector3 
+ * @return A new vec3 
  */
-PANCAKE_INLINE Vector3 vec3_from_vec4(Vector4 vector) {
-    return (Vector3){vector.x, vector.y, vector.z};
+PANCAKE_INLINE vec3 vec3_from_vec4(vec4 vector) {
+    return (vec3){vector.x, vector.y, vector.z};
 }
 
 /**
- * @brief Returns a new Vector4 using vector as the x, y and z components and w for w.
+ * @brief Returns a new vec4 using vector as the x, y and z components and w for w.
  * 
  * @param vector The 3-component vector.
  * @param w The w component.
- * @return A new Vector4 
+ * @return A new vec4 
  */
-PANCAKE_INLINE Vector4 vec3_to_vec4(Vector3 vector, f32 w) {
-    return (Vector4){vector.x, vector.y, vector.z, w};
+PANCAKE_INLINE vec4 vec3_to_vec4(vec3 vector, f32 w) {
+    return (vec4){vector.x, vector.y, vector.z, w};
 }
 
 /**
  * @brief Creates and returns a 3-component vector with all components set to 0.0f.
  */
-PANCAKE_INLINE Vector3 vec3_zero() {
-    return (Vector3){0.0f, 0.0f, 0.0f};
+PANCAKE_INLINE vec3 vec3_zero() {
+    return (vec3){0.0f, 0.0f, 0.0f};
 }
 
 /**
  * @brief Creates and returns a 3-component vector with all components set to 1.0f.
  */
-PANCAKE_INLINE Vector3 vec3_one() {
-    return (Vector3){1.0f, 1.0f, 1.0f};
+PANCAKE_INLINE vec3 vec3_one() {
+    return (vec3){1.0f, 1.0f, 1.0f};
 }
 
 /**
  * @brief Creates and returns a 3-component vector pointing up (0, 1, 0).
  */
-PANCAKE_INLINE Vector3 vec3_up() {
-    return (Vector3){0.0f, 1.0f, 0.0f};
+PANCAKE_INLINE vec3 vec3_up() {
+    return (vec3){0.0f, 1.0f, 0.0f};
 }
 
 /**
  * @brief Creates and returns a 3-component vector pointing down (0, -1, 0).
  */
-PANCAKE_INLINE Vector3 vec3_down() {
-    return (Vector3){0.0f, -1.0f, 0.0f};
+PANCAKE_INLINE vec3 vec3_down() {
+    return (vec3){0.0f, -1.0f, 0.0f};
 }
 
 /**
  * @brief Creates and returns a 3-component vector pointing left (-1, 0, 0).
  */
-PANCAKE_INLINE Vector3 vec3_left() {
-    return (Vector3){-1.0f, 0.0f, 0.0f};
+PANCAKE_INLINE vec3 vec3_left() {
+    return (vec3){-1.0f, 0.0f, 0.0f};
 }
 
 /**
  * @brief Creates and returns a 3-component vector pointing right (1, 0, 0).
  */
-PANCAKE_INLINE Vector3 vec3_right() {
-    return (Vector3){1.0f, 0.0f, 0.0f};
+PANCAKE_INLINE vec3 vec3_right() {
+    return (vec3){1.0f, 0.0f, 0.0f};
 }
 
 /**
  * @brief Creates and returns a 3-component vector pointing forward (0, 0, -1).
  */
-PANCAKE_INLINE Vector3 vec3_forward() {
-    return (Vector3){0.0f, 0.0f, -1.0f};//TODO: switch to left handed coordinate system
+PANCAKE_INLINE vec3 vec3_forward() {
+    return (vec3){0.0f, 0.0f, -1.0f};
 }
+
 /**
  * @brief Creates and returns a 3-component vector pointing backward (0, 0, 1).
  */
-PANCAKE_INLINE Vector3 vec3_back() {
-    return (Vector3){0.0f, 0.0f, 1.0f};
+PANCAKE_INLINE vec3 vec3_back() {
+    return (vec3){0.0f, 0.0f, 1.0f};
 }
 
 /**
@@ -347,8 +345,8 @@ PANCAKE_INLINE Vector3 vec3_back() {
  * @param vector_1 The second vector.
  * @return The resulting vector. 
  */
-PANCAKE_INLINE Vector3 vec3_add(Vector3 vector_0, Vector3 vector_1) {
-    return (Vector3){
+PANCAKE_INLINE vec3 vec3_add(vec3 vector_0, vec3 vector_1) {
+    return (vec3){
         vector_0.x + vector_1.x,
         vector_0.y + vector_1.y,
         vector_0.z + vector_1.z};
@@ -361,8 +359,8 @@ PANCAKE_INLINE Vector3 vec3_add(Vector3 vector_0, Vector3 vector_1) {
  * @param vector_1 The second vector.
  * @return The resulting vector. 
  */
-PANCAKE_INLINE Vector3 vec3_sub(Vector3 vector_0, Vector3 vector_1) {
-    return (Vector3){
+PANCAKE_INLINE vec3 vec3_sub(vec3 vector_0, vec3 vector_1) {
+    return (vec3){
         vector_0.x - vector_1.x,
         vector_0.y - vector_1.y,
         vector_0.z - vector_1.z};
@@ -375,8 +373,8 @@ PANCAKE_INLINE Vector3 vec3_sub(Vector3 vector_0, Vector3 vector_1) {
  * @param vector_1 The second vector.
  * @return The resulting vector. 
  */
-PANCAKE_INLINE Vector3 vec3_mul(Vector3 vector_0, Vector3 vector_1) {
-    return (Vector3){
+PANCAKE_INLINE vec3 vec3_mul(vec3 vector_0, vec3 vector_1) {
+    return (vec3){
         vector_0.x * vector_1.x,
         vector_0.y * vector_1.y,
         vector_0.z * vector_1.z};
@@ -389,8 +387,8 @@ PANCAKE_INLINE Vector3 vec3_mul(Vector3 vector_0, Vector3 vector_1) {
  * @param scalar The scalar value.
  * @return A copy of the resulting vector.
  */
-PANCAKE_INLINE Vector3 vec3_mul_scalar(Vector3 vector_0, f32 scalar) {
-    return (Vector3){
+PANCAKE_INLINE vec3 vec3_mul_scalar(vec3 vector_0, f32 scalar) {
+    return (vec3){
         vector_0.x * scalar,
         vector_0.y * scalar,
         vector_0.z * scalar};
@@ -403,8 +401,8 @@ PANCAKE_INLINE Vector3 vec3_mul_scalar(Vector3 vector_0, f32 scalar) {
  * @param vector_1 The second vector.
  * @return The resulting vector. 
  */
-PANCAKE_INLINE Vector3 vec3_div(Vector3 vector_0, Vector3 vector_1) {
-    return (Vector3){
+PANCAKE_INLINE vec3 vec3_div(vec3 vector_0, vec3 vector_1) {
+    return (vec3){
         vector_0.x / vector_1.x,
         vector_0.y / vector_1.y,
         vector_0.z / vector_1.z};
@@ -416,7 +414,7 @@ PANCAKE_INLINE Vector3 vec3_div(Vector3 vector_0, Vector3 vector_1) {
  * @param vector The vector to retrieve the squared length of.
  * @return The squared length.
  */
-PANCAKE_INLINE f32 vec3_length_squared(Vector3 vector) {
+PANCAKE_INLINE f32 vec3_length_squared(vec3 vector) {
     return vector.x * vector.x + vector.y * vector.y + vector.z * vector.z;
 }
 
@@ -426,8 +424,8 @@ PANCAKE_INLINE f32 vec3_length_squared(Vector3 vector) {
  * @param vector The vector to retrieve the length of.
  * @return The length.
  */
-PANCAKE_INLINE f32 vec3_length(Vector3 vector) {
-    return pancake_sqrt(vec3_length_squared(vector));
+PANCAKE_INLINE f32 vec3_length(vec3 vector) {
+    return ksqrt(vec3_length_squared(vector));
 }
 
 /**
@@ -435,7 +433,7 @@ PANCAKE_INLINE f32 vec3_length(Vector3 vector) {
  * 
  * @param vector A pointer to the vector to be normalized.
  */
-PANCAKE_INLINE void vec3_normalize(Vector3* vector) {
+PANCAKE_INLINE void vec3_normalize(vec3* vector) {
     const f32 length = vec3_length(*vector);
     vector->x /= length;
     vector->y /= length;
@@ -448,7 +446,7 @@ PANCAKE_INLINE void vec3_normalize(Vector3* vector) {
  * @param vector The vector to be normalized.
  * @return A normalized copy of the supplied vector 
  */
-PANCAKE_INLINE Vector3 vec3_normalized(Vector3 vector) {
+PANCAKE_INLINE vec3 vec3_normalized(vec3 vector) {
     vec3_normalize(&vector);
     return vector;
 }
@@ -461,7 +459,7 @@ PANCAKE_INLINE Vector3 vec3_normalized(Vector3 vector) {
  * @param vector_1 The second vector.
  * @return The dot product. 
  */
-PANCAKE_INLINE f32 vec3_dot(Vector3 vector_0, Vector3 vector_1) {
+PANCAKE_INLINE f32 vec3_dot(vec3 vector_0, vec3 vector_1) {
     f32 p = 0;
     p += vector_0.x * vector_1.x;
     p += vector_0.y * vector_1.y;
@@ -477,8 +475,8 @@ PANCAKE_INLINE f32 vec3_dot(Vector3 vector_0, Vector3 vector_1) {
  * @param vector_1 The second vector.
  * @return The cross product. 
  */
-PANCAKE_INLINE Vector3 vec3_cross(Vector3 vector_0, Vector3 vector_1) {
-    return (Vector3){
+PANCAKE_INLINE vec3 vec3_cross(vec3 vector_0, vec3 vector_1) {
+    return (vec3){
         vector_0.y * vector_1.z - vector_0.z * vector_1.y,
         vector_0.z * vector_1.x - vector_0.x * vector_1.z,
         vector_0.x * vector_1.y - vector_0.y * vector_1.x};
@@ -493,16 +491,16 @@ PANCAKE_INLINE Vector3 vec3_cross(Vector3 vector_0, Vector3 vector_1) {
  * @param tolerance The difference tolerance. Typically K_FLOAT_EPSILON or similar.
  * @return True if within tolerance; otherwise false. 
  */
-PANCAKE_INLINE const b8 vec3_compare(Vector3 vector_0, Vector3 vector_1, f32 tolerance) {
-    if (pancake_abs(vector_0.x - vector_1.x) > tolerance) {
+PANCAKE_INLINE const b8 vec3_compare(vec3 vector_0, vec3 vector_1, f32 tolerance) {
+    if (kabs(vector_0.x - vector_1.x) > tolerance) {
         return false;
     }
 
-    if (pancake_abs(vector_0.y - vector_1.y) > tolerance) {
+    if (kabs(vector_0.y - vector_1.y) > tolerance) {
         return false;
     }
 
-    if (pancake_abs(vector_0.z - vector_1.z) > tolerance) {
+    if (kabs(vector_0.z - vector_1.z) > tolerance) {
         return false;
     }
 
@@ -516,8 +514,8 @@ PANCAKE_INLINE const b8 vec3_compare(Vector3 vector_0, Vector3 vector_1, f32 tol
  * @param vector_1 The second vector.
  * @return The distance between vector_0 and vector_1.
  */
-PANCAKE_INLINE f32 vec3_distance(Vector3 vector_0, Vector3 vector_1) {
-    Vector3 d = (Vector3){
+PANCAKE_INLINE f32 vec3_distance(vec3 vector_0, vec3 vector_1) {
+    vec3 d = (vec3){
         vector_0.x - vector_1.x,
         vector_0.y - vector_1.y,
         vector_0.z - vector_1.z};
@@ -538,9 +536,9 @@ PANCAKE_INLINE f32 vec3_distance(Vector3 vector_0, Vector3 vector_1) {
  * @param w The w value.
  * @return A new 4-element vector.
  */
-PANCAKE_INLINE Vector4 vec4_create(f32 x, f32 y, f32 z, f32 w) {
-    Vector4 out_vector;
-#if defined(PANCAKE_USE_SIMD)
+PANCAKE_INLINE vec4 vec4_create(f32 x, f32 y, f32 z, f32 w) {
+    vec4 out_vector;
+#if defined(KUSE_SIMD)
     out_vector.data = _mm_setr_ps(x, y, z, w);
 #else
     out_vector.x = x;
@@ -552,45 +550,45 @@ PANCAKE_INLINE Vector4 vec4_create(f32 x, f32 y, f32 z, f32 w) {
 }
 
 /**
- * @brief Returns a new Vector3 containing the x, y and z components of the 
- * supplied Vector4, essentially dropping the w component.
+ * @brief Returns a new vec3 containing the x, y and z components of the 
+ * supplied vec4, essentially dropping the w component.
  * 
  * @param vector The 4-component vector to extract from.
- * @return A new Vector3 
+ * @return A new vec3 
  */
-PANCAKE_INLINE Vector3 vec4_to_vec3(Vector4 vector) {
-    return (Vector3){vector.x, vector.y, vector.z};
+PANCAKE_INLINE vec3 vec4_to_vec3(vec4 vector) {
+    return (vec3){vector.x, vector.y, vector.z};
 }
 
 /**
- * @brief Returns a new Vector4 using vector as the x, y and z components and w for w.
+ * @brief Returns a new vec4 using vector as the x, y and z components and w for w.
  * 
  * @param vector The 3-component vector.
  * @param w The w component.
- * @return A new Vector4 
+ * @return A new vec4 
  */
-PANCAKE_INLINE Vector4 vec4_from_vec3(Vector3 vector, f32 w) {
-#if defined(PANCAKE_USE_SIMD)
-    Vector4 out_vector;
+PANCAKE_INLINE vec4 vec4_from_vec3(vec3 vector, f32 w) {
+#if defined(KUSE_SIMD)
+    vec4 out_vector;
     out_vector.data = _mm_setr_ps(x, y, z, w);
     return out_vector;
 #else
-    return (Vector4){vector.x, vector.y, vector.z, w};
+    return (vec4){vector.x, vector.y, vector.z, w};
 #endif
 }
 
 /**
  * @brief Creates and returns a 3-component vector with all components set to 0.0f.
  */
-PANCAKE_INLINE Vector4 vec4_zero() {
-    return (Vector4){0.0f, 0.0f, 0.0f, 0.0f};
+PANCAKE_INLINE vec4 vec4_zero() {
+    return (vec4){0.0f, 0.0f, 0.0f, 0.0f};
 }
 
 /**
  * @brief Creates and returns a 3-component vector with all components set to 1.0f.
  */
-PANCAKE_INLINE Vector4 vec4_one() {
-    return (Vector4){1.0f, 1.0f, 1.0f, 1.0f};
+PANCAKE_INLINE vec4 vec4_one() {
+    return (vec4){1.0f, 1.0f, 1.0f, 1.0f};
 }
 
 /**
@@ -600,8 +598,8 @@ PANCAKE_INLINE Vector4 vec4_one() {
  * @param vector_1 The second vector.
  * @return The resulting vector. 
  */
-PANCAKE_INLINE Vector4 vec4_add(Vector4 vector_0, Vector4 vector_1) {
-    Vector4 result;
+PANCAKE_INLINE vec4 vec4_add(vec4 vector_0, vec4 vector_1) {
+    vec4 result;
      for (u64 i = 0; i < 4; ++i) {
         result.elements[i] = vector_0.elements[i] + vector_1.elements[i];
     }
@@ -615,8 +613,8 @@ PANCAKE_INLINE Vector4 vec4_add(Vector4 vector_0, Vector4 vector_1) {
  * @param vector_1 The second vector.
  * @return The resulting vector. 
  */
-PANCAKE_INLINE Vector4 vec4_sub(Vector4 vector_0, Vector4 vector_1) {
-    Vector4 result;
+PANCAKE_INLINE vec4 vec4_sub(vec4 vector_0, vec4 vector_1) {
+    vec4 result;
     for (u64 i = 0; i < 4; ++i) {
         result.elements[i] = vector_0.elements[i] - vector_1.elements[i];
     }
@@ -630,8 +628,8 @@ PANCAKE_INLINE Vector4 vec4_sub(Vector4 vector_0, Vector4 vector_1) {
  * @param vector_1 The second vector.
  * @return The resulting vector. 
  */
-PANCAKE_INLINE Vector4 vec4_mul(Vector4 vector_0, Vector4 vector_1) {
-    Vector4 result;
+PANCAKE_INLINE vec4 vec4_mul(vec4 vector_0, vec4 vector_1) {
+    vec4 result;
     for (u64 i = 0; i < 4; ++i) {
         result.elements[i] = vector_0.elements[i] * vector_1.elements[i];
     }
@@ -645,8 +643,8 @@ PANCAKE_INLINE Vector4 vec4_mul(Vector4 vector_0, Vector4 vector_1) {
  * @param vector_1 The second vector.
  * @return The resulting vector. 
  */
-PANCAKE_INLINE Vector4 vec4_div(Vector4 vector_0, Vector4 vector_1) {
-    Vector4 result;
+PANCAKE_INLINE vec4 vec4_div(vec4 vector_0, vec4 vector_1) {
+    vec4 result;
     for (u64 i = 0; i < 4; ++i) {
         result.elements[i] = vector_0.elements[i] / vector_1.elements[i];
     }
@@ -659,7 +657,7 @@ PANCAKE_INLINE Vector4 vec4_div(Vector4 vector_0, Vector4 vector_1) {
  * @param vector The vector to retrieve the squared length of.
  * @return The squared length.
  */
-PANCAKE_INLINE f32 vec4_length_squared(Vector4 vector) {
+PANCAKE_INLINE f32 vec4_length_squared(vec4 vector) {
     return vector.x * vector.x + vector.y * vector.y + vector.z * vector.z + vector.w * vector.w;
 }
 
@@ -669,8 +667,8 @@ PANCAKE_INLINE f32 vec4_length_squared(Vector4 vector) {
  * @param vector The vector to retrieve the length of.
  * @return The length.
  */
-PANCAKE_INLINE f32 vec4_length(Vector4 vector) {
-    return pancake_sqrt(vec4_length_squared(vector));
+PANCAKE_INLINE f32 vec4_length(vec4 vector) {
+    return ksqrt(vec4_length_squared(vector));
 }
 
 /**
@@ -678,7 +676,7 @@ PANCAKE_INLINE f32 vec4_length(Vector4 vector) {
  * 
  * @param vector A pointer to the vector to be normalized.
  */
-PANCAKE_INLINE void vec4_normalize(Vector4* vector) {
+PANCAKE_INLINE void vec4_normalize(vec4* vector) {
     const f32 length = vec4_length(*vector);
     vector->x /= length;
     vector->y /= length;
@@ -692,7 +690,7 @@ PANCAKE_INLINE void vec4_normalize(Vector4* vector) {
  * @param vector The vector to be normalized.
  * @return A normalized copy of the supplied vector 
  */
-PANCAKE_INLINE Vector4 vec4_normalized(Vector4 vector) {
+PANCAKE_INLINE vec4 vec4_normalized(vec4 vector) {
     vec4_normalize(&vector);
     return vector;
 }
@@ -721,8 +719,8 @@ PANCAKE_INLINE f32 vec4_dot_f32(
  * 
  * @return A new identity matrix 
  */
-PANCAKE_INLINE Matrix4 mat4_identity() {
-    Matrix4 out_matrix;
+PANCAKE_INLINE mat4 mat4_identity() {
+    mat4 out_matrix;
     pancake_zero_memory(out_matrix.data, sizeof(f32) * 16);
     out_matrix.data[0] = 1.0f;
     out_matrix.data[5] = 1.0f;
@@ -738,8 +736,8 @@ PANCAKE_INLINE Matrix4 mat4_identity() {
  * @param matrix_1 The second matrix to be multiplied.
  * @return The result of the matrix multiplication.
  */
-PANCAKE_INLINE Matrix4 mat4_mul(Matrix4 matrix_0, Matrix4 matrix_1) {
-    Matrix4 out_matrix = mat4_identity();
+PANCAKE_INLINE mat4 mat4_mul(mat4 matrix_0, mat4 matrix_1) {
+    mat4 out_matrix = mat4_identity();
 
     const f32* m1_ptr = matrix_0.data;
     const f32* m2_ptr = matrix_1.data;
@@ -771,8 +769,8 @@ PANCAKE_INLINE Matrix4 mat4_mul(Matrix4 matrix_0, Matrix4 matrix_1) {
  * @param far_clip The far clipping plane distance.
  * @return A new orthographic projection matrix. 
  */
-PANCAKE_INLINE Matrix4 mat4_orthographic(f32 left, f32 right, f32 bottom, f32 top, f32 near_clip, f32 far_clip) {
-    Matrix4 out_matrix = mat4_identity();
+PANCAKE_INLINE mat4 mat4_orthographic(f32 left, f32 right, f32 bottom, f32 top, f32 near_clip, f32 far_clip) {
+    mat4 out_matrix = mat4_identity();
 
     f32 lr = 1.0f / (left - right);
     f32 bt = 1.0f / (bottom - top);
@@ -797,9 +795,9 @@ PANCAKE_INLINE Matrix4 mat4_orthographic(f32 left, f32 right, f32 bottom, f32 to
  * @param far_clip The far clipping plane distance.
  * @return A new perspective matrix. 
  */
-PANCAKE_INLINE Matrix4 mat4_perspective(f32 fov_radians, f32 aspect_ratio, f32 near_clip, f32 far_clip) {
-    f32 half_tan_fov = pancake_tan(fov_radians * 0.5f);
-    Matrix4 out_matrix;
+PANCAKE_INLINE mat4 mat4_perspective(f32 fov_radians, f32 aspect_ratio, f32 near_clip, f32 far_clip) {
+    f32 half_tan_fov = ktan(fov_radians * 0.5f);
+    mat4 out_matrix;
     pancake_zero_memory(out_matrix.data, sizeof(f32) * 16);
     out_matrix.data[0] = 1.0f / (aspect_ratio * half_tan_fov);
     out_matrix.data[5] = 1.0f / half_tan_fov;
@@ -818,16 +816,16 @@ PANCAKE_INLINE Matrix4 mat4_perspective(f32 fov_radians, f32 aspect_ratio, f32 n
  * @param up The up vector.
  * @return A matrix looking at target from the perspective of position. 
  */
-PANCAKE_INLINE Matrix4 mat4_look_at(Vector3 position, Vector3 target, Vector3 up) {
-    Matrix4 out_matrix;
-    Vector3 z_axis;
+PANCAKE_INLINE mat4 mat4_look_at(vec3 position, vec3 target, vec3 up) {
+    mat4 out_matrix;
+    vec3 z_axis;
     z_axis.x = target.x - position.x;
     z_axis.y = target.y - position.y;
     z_axis.z = target.z - position.z;
 
     z_axis = vec3_normalized(z_axis);
-    Vector3 x_axis = vec3_normalized(vec3_cross(z_axis, up));
-    Vector3 y_axis = vec3_cross(x_axis, z_axis);
+    vec3 x_axis = vec3_normalized(vec3_cross(z_axis, up));
+    vec3 y_axis = vec3_cross(x_axis, z_axis);
 
     out_matrix.data[0] = x_axis.x;
     out_matrix.data[1] = y_axis.x;
@@ -855,8 +853,8 @@ PANCAKE_INLINE Matrix4 mat4_look_at(Vector3 position, Vector3 target, Vector3 up
  * @param matrix The matrix to be transposed.
  * @return A transposed copy of of the provided matrix.
  */
-PANCAKE_INLINE Matrix4 mat4_transposed(Matrix4 matrix) {
-    Matrix4 out_matrix = mat4_identity();
+PANCAKE_INLINE mat4 mat4_transposed(mat4 matrix) {
+    mat4 out_matrix = mat4_identity();
     out_matrix.data[0] = matrix.data[0];
     out_matrix.data[1] = matrix.data[4];
     out_matrix.data[2] = matrix.data[8];
@@ -882,7 +880,7 @@ PANCAKE_INLINE Matrix4 mat4_transposed(Matrix4 matrix) {
  * @param matrix The matrix to be inverted.
  * @return A inverted copy of the provided matrix. 
  */
-PANCAKE_INLINE Matrix4 mat4_inverse(Matrix4 matrix) {
+PANCAKE_INLINE mat4 mat4_inverse(mat4 matrix) {
     const f32* m = matrix.data;
 
     f32 t0 = m[10] * m[15];
@@ -910,7 +908,7 @@ PANCAKE_INLINE Matrix4 mat4_inverse(Matrix4 matrix) {
     f32 t22 = m[0] * m[5];
     f32 t23 = m[4] * m[1];
 
-    Matrix4 out_matrix;
+    mat4 out_matrix;
     f32* o = out_matrix.data;
 
     o[0] = (t0 * m[5] + t3 * m[9] + t4 * m[13]) - (t1 * m[5] + t2 * m[9] + t5 * m[13]);
@@ -940,8 +938,8 @@ PANCAKE_INLINE Matrix4 mat4_inverse(Matrix4 matrix) {
     return out_matrix;
 }
 
-PANCAKE_INLINE Matrix4 mat4_translation(Vector3 position) {
-    Matrix4 out_matrix = mat4_identity();
+PANCAKE_INLINE mat4 mat4_translation(vec3 position) {
+    mat4 out_matrix = mat4_identity();
     out_matrix.data[12] = position.x;
     out_matrix.data[13] = position.y;
     out_matrix.data[14] = position.z;
@@ -954,18 +952,18 @@ PANCAKE_INLINE Matrix4 mat4_translation(Vector3 position) {
  * @param scale The 3-component scale.
  * @return A scale matrix.
  */
-PANCAKE_INLINE Matrix4 mat4_scale(Vector3 scale) {
-    Matrix4 out_matrix = mat4_identity();
+PANCAKE_INLINE mat4 mat4_scale(vec3 scale) {
+    mat4 out_matrix = mat4_identity();
     out_matrix.data[0] = scale.x;
     out_matrix.data[5] = scale.y;
     out_matrix.data[10] = scale.z;
     return out_matrix;
 }
 
-PANCAKE_INLINE Matrix4 mat4_euler_x(f32 angle_radians) {
-    Matrix4 out_matrix = mat4_identity();
-    f32 c = pancake_cos(angle_radians);
-    f32 s = pancake_sin(angle_radians);
+PANCAKE_INLINE mat4 mat4_euler_x(f32 angle_radians) {
+    mat4 out_matrix = mat4_identity();
+    f32 c = kcos(angle_radians);
+    f32 s = ksin(angle_radians);
 
     out_matrix.data[5] = c;
     out_matrix.data[6] = s;
@@ -973,10 +971,10 @@ PANCAKE_INLINE Matrix4 mat4_euler_x(f32 angle_radians) {
     out_matrix.data[10] = c;
     return out_matrix;
 }
-PANCAKE_INLINE Matrix4 mat4_euler_y(f32 angle_radians) {
-    Matrix4 out_matrix = mat4_identity();
-    f32 c = pancake_cos(angle_radians);
-    f32 s = pancake_sin(angle_radians);
+PANCAKE_INLINE mat4 mat4_euler_y(f32 angle_radians) {
+    mat4 out_matrix = mat4_identity();
+    f32 c = kcos(angle_radians);
+    f32 s = ksin(angle_radians);
 
     out_matrix.data[0] = c;
     out_matrix.data[2] = -s;
@@ -984,11 +982,11 @@ PANCAKE_INLINE Matrix4 mat4_euler_y(f32 angle_radians) {
     out_matrix.data[10] = c;
     return out_matrix;
 }
-PANCAKE_INLINE Matrix4 mat4_euler_z(f32 angle_radians) {
-    Matrix4 out_matrix = mat4_identity();
+PANCAKE_INLINE mat4 mat4_euler_z(f32 angle_radians) {
+    mat4 out_matrix = mat4_identity();
 
-    f32 c = pancake_cos(angle_radians);
-    f32 s = pancake_sin(angle_radians);
+    f32 c = kcos(angle_radians);
+    f32 s = ksin(angle_radians);
 
     out_matrix.data[0] = c;
     out_matrix.data[1] = s;
@@ -996,11 +994,11 @@ PANCAKE_INLINE Matrix4 mat4_euler_z(f32 angle_radians) {
     out_matrix.data[5] = c;
     return out_matrix;
 }
-PANCAKE_INLINE Matrix4 mat4_euler_xyz(f32 x_radians, f32 y_radians, f32 z_radians) {
-    Matrix4 rx = mat4_euler_x(x_radians);
-    Matrix4 ry = mat4_euler_y(y_radians);
-    Matrix4 rz = mat4_euler_z(z_radians);
-    Matrix4 out_matrix = mat4_mul(rx, ry);
+PANCAKE_INLINE mat4 mat4_euler_xyz(f32 x_radians, f32 y_radians, f32 z_radians) {
+    mat4 rx = mat4_euler_x(x_radians);
+    mat4 ry = mat4_euler_y(y_radians);
+    mat4 rz = mat4_euler_z(z_radians);
+    mat4 out_matrix = mat4_mul(rx, ry);
     out_matrix = mat4_mul(out_matrix, rz);
     return out_matrix;
 }
@@ -1011,8 +1009,8 @@ PANCAKE_INLINE Matrix4 mat4_euler_xyz(f32 x_radians, f32 y_radians, f32 z_radian
  * @param matrix The matrix from which to base the vector.
  * @return A 3-component directional vector.
  */
-PANCAKE_INLINE Vector3 mat4_forward(Matrix4 matrix) {
-    Vector3 forward;
+PANCAKE_INLINE vec3 mat4_forward(mat4 matrix) {
+    vec3 forward;
     forward.x = -matrix.data[2];
     forward.y = -matrix.data[6];
     forward.z = -matrix.data[10];
@@ -1026,8 +1024,8 @@ PANCAKE_INLINE Vector3 mat4_forward(Matrix4 matrix) {
  * @param matrix The matrix from which to base the vector.
  * @return A 3-component directional vector.
  */
-PANCAKE_INLINE Vector3 mat4_backward(Matrix4 matrix) {
-    Vector3 backward;
+PANCAKE_INLINE vec3 mat4_backward(mat4 matrix) {
+    vec3 backward;
     backward.x = matrix.data[2];
     backward.y = matrix.data[6];
     backward.z = matrix.data[10];
@@ -1041,8 +1039,8 @@ PANCAKE_INLINE Vector3 mat4_backward(Matrix4 matrix) {
  * @param matrix The matrix from which to base the vector.
  * @return A 3-component directional vector.
  */
-PANCAKE_INLINE Vector3 mat4_up(Matrix4 matrix) {
-    Vector3 up;
+PANCAKE_INLINE vec3 mat4_up(mat4 matrix) {
+    vec3 up;
     up.x = matrix.data[1];
     up.y = matrix.data[5];
     up.z = matrix.data[9];
@@ -1056,8 +1054,8 @@ PANCAKE_INLINE Vector3 mat4_up(Matrix4 matrix) {
  * @param matrix The matrix from which to base the vector.
  * @return A 3-component directional vector.
  */
-PANCAKE_INLINE Vector3 mat4_down(Matrix4 matrix) {
-    Vector3 down;
+PANCAKE_INLINE vec3 mat4_down(mat4 matrix) {
+    vec3 down;
     down.x = -matrix.data[1];
     down.y = -matrix.data[5];
     down.z = -matrix.data[9];
@@ -1071,8 +1069,8 @@ PANCAKE_INLINE Vector3 mat4_down(Matrix4 matrix) {
  * @param matrix The matrix from which to base the vector.
  * @return A 3-component directional vector.
  */
-PANCAKE_INLINE Vector3 mat4_left(Matrix4 matrix) {
-    Vector3 left;
+PANCAKE_INLINE vec3 mat4_left(mat4 matrix) {
+    vec3 left;
     left.x = -matrix.data[0];
     left.y = -matrix.data[4];
     left.z = -matrix.data[8];
@@ -1086,8 +1084,8 @@ PANCAKE_INLINE Vector3 mat4_left(Matrix4 matrix) {
  * @param matrix The matrix from which to base the vector.
  * @return A 3-component directional vector.
  */
-PANCAKE_INLINE Vector3 mat4_right(Matrix4 matrix) {
-    Vector3 right;
+PANCAKE_INLINE vec3 mat4_right(mat4 matrix) {
+    vec3 right;
     right.x = matrix.data[0];
     right.y = matrix.data[4];
     right.z = matrix.data[8];
@@ -1099,41 +1097,41 @@ PANCAKE_INLINE Vector3 mat4_right(Matrix4 matrix) {
 // Quaternion
 // ------------------------------------------
 
-PANCAKE_INLINE quaternion quat_identity() {
-    return (quaternion){0, 0, 0, 1.0f};
+PANCAKE_INLINE quat quat_identity() {
+    return (quat){0, 0, 0, 1.0f};
 }
 
-PANCAKE_INLINE f32 quat_normal(quaternion q) {
-    return pancake_sqrt(
+PANCAKE_INLINE f32 quat_normal(quat q) {
+    return ksqrt(
         q.x * q.x +
         q.y * q.y +
         q.z * q.z +
         q.w * q.w);
 }
 
-PANCAKE_INLINE quaternion quat_normalize(quaternion q) {
+PANCAKE_INLINE quat quat_normalize(quat q) {
     f32 normal = quat_normal(q);
-    return (quaternion){
+    return (quat){
         q.x / normal,
         q.y / normal,
         q.z / normal,
         q.w / normal};
 }
 
-PANCAKE_INLINE quaternion quat_conjugate(quaternion q) {
-    return (quaternion){
+PANCAKE_INLINE quat quat_conjugate(quat q) {
+    return (quat){
         -q.x,
         -q.y,
         -q.z,
         q.w};
 }
 
-PANCAKE_INLINE quaternion quat_inverse(quaternion q) {
+PANCAKE_INLINE quat quat_inverse(quat q) {
     return quat_normalize(quat_conjugate(q));
 }
 
-PANCAKE_INLINE quaternion quat_mul(quaternion q_0, quaternion q_1) {
-    quaternion out_quaternion;
+PANCAKE_INLINE quat quat_mul(quat q_0, quat q_1) {
+    quat out_quaternion;
 
     out_quaternion.x = q_0.x * q_1.w +
                        q_0.y * q_1.z -
@@ -1158,19 +1156,19 @@ PANCAKE_INLINE quaternion quat_mul(quaternion q_0, quaternion q_1) {
     return out_quaternion;
 }
 
-PANCAKE_INLINE f32 quat_dot(quaternion q_0, quaternion q_1) {
+PANCAKE_INLINE f32 quat_dot(quat q_0, quat q_1) {
     return q_0.x * q_1.x +
            q_0.y * q_1.y +
            q_0.z * q_1.z +
            q_0.w * q_1.w;
 }
 
-PANCAKE_INLINE Matrix4 quat_to_mat4(quaternion q) {
-    Matrix4 out_matrix = mat4_identity();
+PANCAKE_INLINE mat4 quat_to_mat4(quat q) {
+    mat4 out_matrix = mat4_identity();
 
     // https://stackoverflow.com/questions/1556260/convert-quaternion-rotation-to-rotation-matrix
 
-    quaternion n = quat_normalize(q);
+    quat n = quat_normalize(q);
 
     out_matrix.data[0] = 1.0f - 2.0f * n.y * n.y - 2.0f * n.z * n.z;
     out_matrix.data[1] = 2.0f * n.x * n.y - 2.0f * n.z * n.w;
@@ -1188,8 +1186,8 @@ PANCAKE_INLINE Matrix4 quat_to_mat4(quaternion q) {
 }
 
 // Calculates a rotation matrix based on the quaternion and the passed in center point.
-PANCAKE_INLINE Matrix4 quat_to_rotation_matrix(quaternion q, Vector3 center) {
-    Matrix4 out_matrix;
+PANCAKE_INLINE mat4 quat_to_rotation_matrix(quat q, vec3 center) {
+    mat4 out_matrix;
 
     f32* o = out_matrix.data;
     o[0] = (q.x * q.x) - (q.y * q.y) - (q.z * q.z) + (q.w * q.w);
@@ -1214,25 +1212,25 @@ PANCAKE_INLINE Matrix4 quat_to_rotation_matrix(quaternion q, Vector3 center) {
     return out_matrix;
 }
 
-PANCAKE_INLINE quaternion quat_from_axis_angle(Vector3 axis, f32 angle, b8 normalize) {
+PANCAKE_INLINE quat quat_from_axis_angle(vec3 axis, f32 angle, b8 normalize) {
     const f32 half_angle = 0.5f * angle;
-    f32 s = pancake_sin(half_angle);
-    f32 c = pancake_cos(half_angle);
+    f32 s = ksin(half_angle);
+    f32 c = kcos(half_angle);
 
-    quaternion q = (quaternion){s * axis.x, s * axis.y, s * axis.z, c};
+    quat q = (quat){s * axis.x, s * axis.y, s * axis.z, c};
     if (normalize) {
         return quat_normalize(q);
     }
     return q;
 }
 
-PANCAKE_INLINE quaternion quat_slerp(quaternion q_0, quaternion q_1, f32 percentage) {
-    quaternion out_quaternion;
+PANCAKE_INLINE quat quat_slerp(quat q_0, quat q_1, f32 percentage) {
+    quat out_quaternion;
     // Source: https://en.wikipedia.org/wiki/Slerp
     // Only unit quaternions are valid rotations.
     // Normalize to avoid undefined behavior.
-    quaternion v0 = quat_normalize(q_0);
-    quaternion v1 = quat_normalize(q_1);
+    quat v0 = quat_normalize(q_0);
+    quat v1 = quat_normalize(q_1);
 
     // Compute the cosine of the angle between the two vectors.
     f32 dot = quat_dot(v0, v1);
@@ -1253,7 +1251,7 @@ PANCAKE_INLINE quaternion quat_slerp(quaternion q_0, quaternion q_1, f32 percent
     if (dot > DOT_THRESHOLD) {
         // If the inputs are too close for comfort, linearly interpolate
         // and normalize the result.
-        out_quaternion = (quaternion){
+        out_quaternion = (quat){
             v0.x + ((v1.x - v0.x) * percentage),
             v0.y + ((v1.y - v0.y) * percentage),
             v0.z + ((v1.z - v0.z) * percentage),
@@ -1263,15 +1261,15 @@ PANCAKE_INLINE quaternion quat_slerp(quaternion q_0, quaternion q_1, f32 percent
     }
 
     // Since dot is in range [0, DOT_THRESHOLD], acos is safe
-    f32 theta_0 = pancake_acos(dot);          // theta_0 = angle between input vectors
+    f32 theta_0 = kacos(dot);          // theta_0 = angle between input vectors
     f32 theta = theta_0 * percentage;  // theta = angle between v0 and result
-    f32 sin_theta = pancake_sin(theta);       // compute this value only once
-    f32 sin_theta_0 = pancake_sin(theta_0);   // compute this value only once
+    f32 sin_theta = ksin(theta);       // compute this value only once
+    f32 sin_theta_0 = ksin(theta_0);   // compute this value only once
 
-    f32 s0 = pancake_cos(theta) - dot * sin_theta / sin_theta_0;  // == sin(theta_0 - theta) / sin(theta_0)
+    f32 s0 = kcos(theta) - dot * sin_theta / sin_theta_0;  // == sin(theta_0 - theta) / sin(theta_0)
     f32 s1 = sin_theta / sin_theta_0;
 
-    return (quaternion){
+    return (quat){
         (v0.x * s0) + (v1.x * s1),
         (v0.y * s0) + (v1.y * s1),
         (v0.z * s0) + (v1.z * s1),
@@ -1285,7 +1283,7 @@ PANCAKE_INLINE quaternion quat_slerp(quaternion q_0, quaternion q_1, f32 percent
  * @return The amount in radians.
  */
 PANCAKE_INLINE f32 deg_to_rad(f32 degrees) {
-    return degrees * DEG2RAD_MULTIPLIER;
+    return degrees * K_DEG2RAD_MULTIPLIER;
 }
 
 /**
@@ -1295,5 +1293,5 @@ PANCAKE_INLINE f32 deg_to_rad(f32 degrees) {
  * @return The amount in degrees.
  */
 PANCAKE_INLINE f32 rad_to_deg(f32 radians) {
-    return radians * RAD2DEG_MULTIPLIER;
+    return radians * K_RAD2DEG_MULTIPLIER;
 }

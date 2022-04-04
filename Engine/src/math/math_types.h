@@ -2,41 +2,72 @@
 
 #include "defines.h"
 
-typedef union Vector2_u{
+typedef union vec2_u {
+    // An array of x, y
     f32 elements[2];
-    union{
-        struct{ f32 x,y; };
-        struct{ f32 r,g; };
-        struct{ f32 s,t; };
-        struct{ f32 u,v; };
+    struct {
+        union {
+            // The first element.
+            f32 x, r, s, u;
+        };
+        union {
+            // The second element.
+            f32 y, g, t, v;
+        };
     };
-}Vector2;
+} vec2;
 
-typedef struct Vector3_u{
+typedef union vec3_u {
+    // An array of x, y, z
     f32 elements[3];
-    union{
-        struct{ f32 x,y,z; };
-        struct{ f32 r,g,b; };
-        struct{ f32 s,t,p; };
-        struct{ f32 u,v,w; };
+    struct {
+        union {
+            // The first element.
+            f32 x, r, s, u;
+        };
+        union {
+            // The second element.
+            f32 y, g, t, v;
+        };
+        union {
+            // The third element.
+            f32 z, b, p, w;
+        };
     };
-}Vector3;
+} vec3;
 
-typedef struct Vector4_u{
+typedef union vec4_u {
+
+    // An array of x, y, z, w
     f32 elements[4];
-    union{
-        struct{ f32 x, y, z, w; };
-        struct{ f32 r, g, b, a; };
-        struct{ f32 s, t, p, q; };
+    union {
+        struct {
+            union {
+                // The first element.
+                f32 x, r, s;
+            };
+            union {
+                // The second element.
+                f32 y, g, t;
+            };
+            union {
+                // The third element.
+                f32 z, b, p;
+            };
+            union {
+                // The fourth element.
+                f32 w, a, q;
+            };
+        };
     };
-}Vector4;
+} vec4;
 
-typedef Vector4 quaternion;
+typedef vec4 quat;
 
-typedef union Matrix4_u{
+typedef union mat4_u {
     f32 data[16];
-}Matrix4;
+} mat4;
 
-typedef struct vertex_3d{
-    Vector3 position;
-}vertex_3d;
+typedef struct vertex_3d {
+    vec3 position;
+} vertex_3d;

@@ -151,7 +151,7 @@ void platform_sleep(u64 ms) {
     nanosleep(&ts, 0);
 }
 
-void platform_get_required_extension_names(const char*** names_darray) {
+void platform_get_required_extensions(const char*** names_list) {
     u32 count = 0;
     const char** extensions = glfwGetRequiredInstanceExtensions(&count);
     for (u32 i = 0; i < count; ++i) {
@@ -159,11 +159,11 @@ void platform_get_required_extension_names(const char*** names_darray) {
             // We already include "VK_KHR_surface", so skip this.
             continue;
         }
-        list_push(*names_darray, extensions[i]);
+        list_push(*names_list, extensions[i]);
     }
 }
 
-b8 platform_create_vulkan_surface(platform_state* plat_state, vulkan_context* context) {
+b8 platform_vulkan_surface_create(platform_state* plat_state, vulkan_context* context) {
     if (!state_ptr) {
         return false;
     }

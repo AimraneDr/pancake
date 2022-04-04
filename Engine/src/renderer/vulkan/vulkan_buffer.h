@@ -8,8 +8,7 @@ b8 vulkan_buffer_create(
     VkBufferUsageFlagBits usage,
     u32 memory_property_flags,
     b8 bind_on_create,
-    vulkan_buffer* out_buffer
-);
+    vulkan_buffer* out_buffer);
 
 void vulkan_buffer_destroy(vulkan_context* context, vulkan_buffer* buffer);
 
@@ -36,5 +35,4 @@ void vulkan_buffer_copy_to(
     u64 source_offset,
     VkBuffer dest,
     u64 dest_offset,
-    u64 size
-);
+    u64 size);

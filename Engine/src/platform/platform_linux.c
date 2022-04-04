@@ -344,7 +344,7 @@ void platform_get_required_extensions(const char ***names_list){
 }
 
 // Surface creation for Vulkan
-b8 platform_create_vulkan_surface(vulkan_context *context) {
+b8 platform_vulkan_surface_create(vulkan_context *context) {
     if(!state_ptr) {
         return false;
     }
@@ -359,7 +359,7 @@ b8 platform_create_vulkan_surface(vulkan_context *context) {
         context->allocator,
         &state_ptr->surface);
     if (result != VK_SUCCESS) {
-        KFATAL("Vulkan surface creation failed.");
+        PANCAKE_FATAL("Vulkan surface creation failed.");
         return false;
     }
 
